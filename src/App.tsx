@@ -7,28 +7,41 @@ import Navigation from "@/components/Navigation";
 import Dashboard from "@/pages/Dashboard";
 import Products from "@/pages/Products";
 import Billing from "@/pages/Billing";
+import React from 'react';
 
-const queryClient = new QueryClient();
+// Create a client
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <BrowserRouter>
-        <div className="flex min-h-screen bg-gray-50">
-          <Navigation />
-          <main className="flex-1 ml-64 p-8 animate-fadeIn">
-            <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/products" element={<Products />} />
-              <Route path="/billing" element={<Billing />} />
-            </Routes>
-          </main>
-        </div>
-      </BrowserRouter>
-      <Toaster />
-      <Sonner />
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+function App() {
+  return (
+    <React.StrictMode>
+      <QueryClientProvider client={queryClient}>
+        <TooltipProvider>
+          <BrowserRouter>
+            <div className="flex min-h-screen bg-gray-50">
+              <Navigation />
+              <main className="flex-1 ml-64 p-8 animate-fadeIn">
+                <Routes>
+                  <Route path="/" element={<Dashboard />} />
+                  <Route path="/products" element={<Products />} />
+                  <Route path="/billing" element={<Billing />} />
+                </Routes>
+              </main>
+            </div>
+          </BrowserRouter>
+          <Toaster />
+          <Sonner />
+        </TooltipProvider>
+      </QueryClientProvider>
+    </React.StrictMode>
+  );
+}
 
 export default App;
