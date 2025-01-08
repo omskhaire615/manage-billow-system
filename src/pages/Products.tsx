@@ -14,11 +14,18 @@ import { Product } from "@/lib/types";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { LowStockAlert } from "@/components/LowStockAlert";
+import { ProductSearch } from "@/components/ProductSearch";
 
 const Products = () => {
   const { products, addProduct, updateProduct, deleteProduct } = useProducts();
   const [isAdding, setIsAdding] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredProducts = products.filter((product) =>
+    product.name.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -43,6 +50,8 @@ const Products = () => {
 
   return (
     <div className="space-y-8">
+      <LowStockAlert />
+      
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-semibold text-gray-900">Products</h1>
         <Button
@@ -53,6 +62,8 @@ const Products = () => {
           Add Product
         </Button>
       </div>
+
+      <ProductSearch onSearch={setSearchQuery} />
 
       {(isAdding || editingProduct) && (
         <Card className="p-6">
@@ -141,12 +152,16 @@ const Products = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {products.map((product) => (
+            {filteredProducts.map((product) => (
               <TableRow key={product.id}>
                 <TableCell>{product.name}</TableCell>
                 <TableCell>{product.category}</TableCell>
                 <TableCell>${product.price.toFixed(2)}</TableCell>
-                <TableCell>{product.stock}</TableCell>
+                <TableCell>
+                  <span className={product.stock < 5 ? "text-red-500 font-bold" : ""}>
+                    {product.stock}
+                  </span>
+                </TableCell>
                 <TableCell>
                   <div className="flex gap-2">
                     <Button

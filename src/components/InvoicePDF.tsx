@@ -25,8 +25,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 20,
   },
-  table: {
-    display: "table",
+  tableContainer: {
+    display: "flex",
     width: "100%",
     marginBottom: 20,
   },
@@ -67,7 +67,7 @@ export const InvoicePDF = ({ invoice, products }: InvoicePDFProps) => {
         <Page size="A4" style={styles.page}>
           <View style={styles.header}>
             <Text style={styles.title}>INVOICE</Text>
-            <Text style={styles.companyName}>Your Company Name</Text>
+            <Text style={styles.companyName}>Radhekrishn Hardware</Text>
           </View>
 
           <View>
@@ -75,7 +75,7 @@ export const InvoicePDF = ({ invoice, products }: InvoicePDFProps) => {
             <Text>Date: {new Date(invoice.date).toLocaleDateString()}</Text>
           </View>
 
-          <View style={styles.table}>
+          <View style={styles.tableContainer}>
             <View style={[styles.tableRow, styles.tableHeader]}>
               <Text style={styles.tableCell}>Product</Text>
               <Text style={styles.tableCell}>Quantity</Text>
