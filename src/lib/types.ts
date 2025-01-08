@@ -1,0 +1,28 @@
+export interface Product {
+  id: string;
+  name: string;
+  description: string;
+  price: number;
+  category: string;
+  stock: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Invoice {
+  id: string;
+  customerName: string;
+  items: {
+    productId: string;
+    quantity: number;
+    price: number;
+  }[];
+  total: number;
+  date: string;
+  status: "paid" | "pending" | "cancelled";
+}
+
+export interface Category {
+  id: string;
+  name: string;
+}
