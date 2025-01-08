@@ -1,8 +1,8 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { Toaster as SonnerToaster } from "sonner";
 import { Toaster } from "@/components/ui/toaster";
-import { Sonner } from "@/components/ui/sonner";
 import Navigation from "@/components/Navigation";
 import Dashboard from "@/pages/Dashboard";
 import Products from "@/pages/Products";
@@ -39,7 +39,7 @@ function App() {
               </div>
             </BrowserRouter>
             <Toaster />
-            <Sonner />
+            <SonnerToaster />
           </TooltipProvider>
         </ProductProvider>
       </QueryClientProvider>

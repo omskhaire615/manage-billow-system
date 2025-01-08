@@ -12,7 +12,6 @@ import {
 import { useProducts } from "@/contexts/ProductContext";
 import { Product } from "@/lib/types";
 import { Card } from "@/components/ui/card";
-import { Form } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
@@ -60,7 +59,7 @@ const Products = () => {
           <h2 className="text-xl font-semibold mb-4">
             {editingProduct ? "Edit Product" : "Add New Product"}
           </h2>
-          <Form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-sm font-medium mb-1">Name</label>
               <Input
@@ -126,7 +125,7 @@ const Products = () => {
                 {editingProduct ? "Update" : "Add"} Product
               </Button>
             </div>
-          </Form>
+          </form>
         </Card>
       )}
 
