@@ -36,6 +36,8 @@ const Products = () => {
       price: parseFloat(formData.get("price") as string),
       category: formData.get("category") as string,
       stock: parseInt(formData.get("stock") as string),
+      dimensions: formData.get("dimensions") as string,
+      imageUrl: formData.get("imageUrl") as string,
     };
 
     if (editingProduct) {
@@ -49,14 +51,14 @@ const Products = () => {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 animate-fadeIn">
       <LowStockAlert />
       
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-semibold text-gray-900">Products</h1>
+        <h1 className="text-3xl font-semibold text-sage-900">Products</h1>
         <Button
           onClick={() => setIsAdding(true)}
-          className="bg-sage-500 hover:bg-sage-600"
+          className="bg-sage-500 hover:bg-sage-600 transition-colors duration-300"
         >
           <Plus className="w-4 h-4 mr-2" />
           Add Product
@@ -66,13 +68,13 @@ const Products = () => {
       <ProductSearch onSearch={setSearchQuery} />
 
       {(isAdding || editingProduct) && (
-        <Card className="p-6">
-          <h2 className="text-xl font-semibold mb-4">
+        <Card className="p-6 animate-slideIn bg-white shadow-lg">
+          <h2 className="text-xl font-semibold mb-4 text-sage-900">
             {editingProduct ? "Edit Product" : "Add New Product"}
           </h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Name</label>
+              <label className="block text-sm font-medium mb-1 text-sage-700">Name</label>
               <Input
                 name="name"
                 defaultValue={editingProduct?.name}
@@ -81,7 +83,7 @@ const Products = () => {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Description</label>
+              <label className="block text-sm font-medium mb-1 text-sage-700">Description</label>
               <Textarea
                 name="description"
                 defaultValue={editingProduct?.description}
@@ -89,9 +91,32 @@ const Products = () => {
                 className="w-full"
               />
             </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-1 text-sage-700">Image URL</label>
+                <Input
+                  name="imageUrl"
+                  type="url"
+                  placeholder="https://example.com/image.jpg"
+                  defaultValue={editingProduct?.imageUrl}
+                  required
+                  className="w-full"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1 text-sage-700">Dimensions (mm)</label>
+                <Input
+                  name="dimensions"
+                  placeholder="100x200x300"
+                  defaultValue={editingProduct?.dimensions}
+                  required
+                  className="w-full"
+                />
+              </div>
+            </div>
             <div className="grid grid-cols-3 gap-4">
               <div>
-                <label className="block text-sm font-medium mb-1">Price</label>
+                <label className="block text-sm font-medium mb-1 text-sage-700">Price (₹)</label>
                 <Input
                   name="price"
                   type="number"
@@ -102,7 +127,7 @@ const Products = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Category</label>
+                <label className="block text-sm font-medium mb-1 text-sage-700">Category</label>
                 <Input
                   name="category"
                   defaultValue={editingProduct?.category}
@@ -111,7 +136,7 @@ const Products = () => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1">Stock</label>
+                <label className="block text-sm font-medium mb-1 text-sage-700">Stock</label>
                 <Input
                   name="stock"
                   type="number"
@@ -129,10 +154,14 @@ const Products = () => {
                   setIsAdding(false);
                   setEditingProduct(null);
                 }}
+                className="hover:bg-sage-50 transition-colors duration-300"
               >
                 Cancel
               </Button>
-              <Button type="submit" className="bg-sage-500 hover:bg-sage-600">
+              <Button 
+                type="submit" 
+                className="bg-sage-500 hover:bg-sage-600 transition-colors duration-300"
+              >
                 {editingProduct ? "Update" : "Add"} Product
               </Button>
             </div>
@@ -140,23 +169,33 @@ const Products = () => {
         </Card>
       )}
 
-      <Card>
+      <Card className="animate-fadeIn">
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead>Image</TableHead>
               <TableHead>Name</TableHead>
               <TableHead>Category</TableHead>
               <TableHead>Price</TableHead>
+              <TableHead>Dimensions</TableHead>
               <TableHead>Stock</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredProducts.map((product) => (
-              <TableRow key={product.id}>
+              <TableRow key={product.id} className="hover:bg-sage-50 transition-colors duration-200">
+                <TableCell>
+                  <img 
+                    src={product.imageUrl} 
+                    alt={product.name} 
+                    className="w-12 h-12 object-cover rounded-md"
+                  />
+                </TableCell>
                 <TableCell>{product.name}</TableCell>
                 <TableCell>{product.category}</TableCell>
-                <TableCell>${product.price.toFixed(2)}</TableCell>
+                <TableCell>₹{product.price.toFixed(2)}</TableCell>
+                <TableCell>{product.dimensions}</TableCell>
                 <TableCell>
                   <span className={product.stock < 5 ? "text-red-500 font-bold" : ""}>
                     {product.stock}
@@ -168,6 +207,7 @@ const Products = () => {
                       variant="outline"
                       size="sm"
                       onClick={() => setEditingProduct(product)}
+                      className="hover:bg-sage-50 transition-colors duration-300"
                     >
                       Edit
                     </Button>
@@ -175,6 +215,7 @@ const Products = () => {
                       variant="destructive"
                       size="sm"
                       onClick={() => deleteProduct(product.id)}
+                      className="hover:bg-red-600 transition-colors duration-300"
                     >
                       Delete
                     </Button>
