@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Package, Receipt, TrendingUp } from "lucide-react";
 import { storage } from "@/lib/storage";
+import { LowStockAlert } from "@/components/LowStockAlert";
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
@@ -23,7 +24,9 @@ const Dashboard = () => {
   }, []);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 animate-fadeIn">
+      <LowStockAlert />
+      
       <h1 className="text-3xl font-semibold text-gray-900">Dashboard</h1>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -63,7 +66,7 @@ const Dashboard = () => {
             <div>
               <p className="text-sm text-gray-500">Total Revenue</p>
               <p className="text-2xl font-semibold text-gray-900">
-                ${stats.totalRevenue.toFixed(2)}
+                ₹{stats.totalRevenue.toFixed(2)}
               </p>
             </div>
           </div>

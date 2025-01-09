@@ -12,6 +12,7 @@ import { InvoicePDF } from "@/components/InvoicePDF";
 import { ProductSearch } from "@/components/ProductSearch";
 import { BillingTable } from "@/components/BillingTable";
 import { ProductSelection } from "@/components/ProductSelection";
+import { BillsTable } from "@/components/BillsTable";
 
 const Billing = () => {
   const { products, updateProduct } = useProducts();
@@ -116,14 +117,19 @@ const Billing = () => {
         <h1 className="text-3xl font-semibold text-gray-900">Billing</h1>
         <Button
           onClick={() => setIsCreating(true)}
-          className="bg-sage-500 hover:bg-sage-600"
+          className="bg-sage-500 hover:bg-sage-600 transition-colors"
         >
           <Plus className="w-4 h-4 mr-2" />
           New Invoice
         </Button>
       </div>
 
-      <ProductSearch onSearch={setSearchQuery} />
+      {!isCreating && (
+        <Card className="p-6">
+          <h2 className="text-xl font-semibold mb-4">Previous Bills</h2>
+          <BillsTable invoices={invoices} />
+        </Card>
+      )}
 
       {isCreating && (
         <Card className="p-6">
@@ -140,6 +146,8 @@ const Billing = () => {
                 required
               />
             </div>
+
+            <ProductSearch onSearch={setSearchQuery} />
 
             <ProductSelection
               filteredProducts={filteredProducts}
