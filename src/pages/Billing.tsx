@@ -10,6 +10,8 @@ import { Input } from "@/components/ui/input";
 import { LowStockAlert } from "@/components/LowStockAlert";
 import { InvoicePDF } from "@/components/InvoicePDF";
 import { ProductSearch } from "@/components/ProductSearch";
+import { BillingTable } from "@/components/BillingTable";
+import { ProductSelection } from "@/components/ProductSelection";
 
 const Billing = () => {
   const { products, updateProduct } = useProducts();
@@ -40,10 +42,6 @@ const Billing = () => {
     }
   };
 
-  const removeProductFromInvoice = (index: number) => {
-    setSelectedProducts(selectedProducts.filter((_, i) => i !== index));
-  };
-
   const calculateTotal = () => {
     return selectedProducts.reduce(
       (total, { product, quantity }) => total + product.price * quantity,
@@ -71,7 +69,6 @@ const Billing = () => {
       return;
     }
 
-    // Update stock for all products
     selectedProducts.forEach(({ product, quantity }) => {
       updateProductStock(product.id, quantity);
     });
@@ -144,64 +141,20 @@ const Billing = () => {
               />
             </div>
 
-            <div>
-              <h3 className="text-lg font-medium mb-2">Products</h3>
-              <div className="flex gap-4 mb-4">
-                <select
-                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  onChange={(e) => addProductToInvoice(e.target.value, 1)}
-                  value=""
-                >
-                  <option value="">Select a product</option>
-                  {filteredProducts.map((product) => (
-                    <option key={product.id} value={product.id}>
-                      {product.name} - ${product.price} (Stock: {product.stock})
-                    </option>
-                  ))}
-                </select>
-              </div>
+            <ProductSelection
+              filteredProducts={filteredProducts}
+              addProductToInvoice={addProductToInvoice}
+            />
 
-              {selectedProducts.map(({ product, quantity }, index) => (
-                <div
-                  key={index}
-                  className="flex items-center justify-between gap-4 mb-2"
-                >
-                  <span>{product.name}</span>
-                  <Input
-                    type="number"
-                    min="1"
-                    max={product.stock}
-                    value={quantity}
-                    onChange={(e) => {
-                      const newQuantity = parseInt(e.target.value);
-                      if (newQuantity > 0 && newQuantity <= product.stock) {
-                        setSelectedProducts(
-                          selectedProducts.map((item, i) =>
-                            i === index
-                              ? { ...item, quantity: newQuantity }
-                              : item
-                          )
-                        );
-                      }
-                    }}
-                    className="w-20"
-                  />
-                  <span>${(product.price * quantity).toFixed(2)}</span>
-                  <Button
-                    variant="destructive"
-                    size="sm"
-                    onClick={() => removeProductFromInvoice(index)}
-                  >
-                    Remove
-                  </Button>
-                </div>
-              ))}
+            <BillingTable
+              selectedProducts={selectedProducts}
+              setSelectedProducts={setSelectedProducts}
+            />
 
-              <div className="mt-4 text-right">
-                <p className="text-lg font-semibold">
-                  Total: ${calculateTotal().toFixed(2)}
-                </p>
-              </div>
+            <div className="mt-4 text-right">
+              <p className="text-lg font-semibold">
+                Total: ₹{calculateTotal().toFixed(2)}
+              </p>
             </div>
 
             <div className="flex justify-end gap-2">

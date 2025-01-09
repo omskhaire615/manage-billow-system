@@ -90,10 +90,10 @@ export const InvoicePDF = ({ invoice, products }: InvoicePDFProps) => {
                   <Text style={styles.tableCell}>{product?.name}</Text>
                   <Text style={styles.tableCell}>{item.quantity}</Text>
                   <Text style={styles.tableCell}>
-                    ${item.price.toFixed(2)}
+                    ₹{item.price.toFixed(2)}
                   </Text>
                   <Text style={styles.tableCell}>
-                    ${(item.quantity * item.price).toFixed(2)}
+                    ₹{(item.quantity * item.price).toFixed(2)}
                   </Text>
                 </View>
               );
@@ -101,7 +101,7 @@ export const InvoicePDF = ({ invoice, products }: InvoicePDFProps) => {
           </View>
 
           <View style={styles.total}>
-            <Text>Total: ${invoice.total.toFixed(2)}</Text>
+            <Text>Total: ₹{invoice.total.toFixed(2)}</Text>
           </View>
         </Page>
       </Document>
