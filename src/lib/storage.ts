@@ -45,6 +45,14 @@ export const storage = {
     localStorage.setItem(STORAGE_KEYS.INVOICES, JSON.stringify(invoices));
   },
 
+  updateInvoiceStatus: (invoiceId: string, status: "paid" | "pending") => {
+    const invoices = storage.getInvoices();
+    const updatedInvoices = invoices.map(invoice =>
+      invoice.id === invoiceId ? { ...invoice, status } : invoice
+    );
+    localStorage.setItem(STORAGE_KEYS.INVOICES, JSON.stringify(updatedInvoices));
+  },
+
   getCategories: (): Category[] => {
     const data = localStorage.getItem(STORAGE_KEYS.CATEGORIES);
     return data ? JSON.parse(data) : [];

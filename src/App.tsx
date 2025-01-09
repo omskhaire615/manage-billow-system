@@ -9,8 +9,8 @@ import Products from "@/pages/Products";
 import Billing from "@/pages/Billing";
 import React from 'react';
 import { ProductProvider } from "@/contexts/ProductContext";
+import { useIsMobile } from "@/hooks/use-mobile";
 
-// Create a client
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -21,6 +21,8 @@ const queryClient = new QueryClient({
 });
 
 function App() {
+  const isMobile = useIsMobile();
+
   return (
     <React.StrictMode>
       <QueryClientProvider client={queryClient}>
@@ -29,7 +31,7 @@ function App() {
             <BrowserRouter>
               <div className="flex min-h-screen bg-gray-50">
                 <Navigation />
-                <main className="flex-1 ml-64 p-8 animate-fadeIn">
+                <main className={`flex-1 p-4 md:p-8 animate-fadeIn ${isMobile ? 'ml-0' : 'ml-64'}`}>
                   <Routes>
                     <Route path="/" element={<Dashboard />} />
                     <Route path="/products" element={<Products />} />

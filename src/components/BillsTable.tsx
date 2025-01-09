@@ -11,55 +11,101 @@ import { Button } from "@/components/ui/button";
 import { Invoice } from "@/lib/types";
 import { InvoicePDF } from "./InvoicePDF";
 import { useProducts } from "@/contexts/ProductContext";
+import { storage } from "@/lib/storage";
+import { toast } from "@/hooks/use-toast";
+import { Check, Download } from "lucide-react";
 
 interface BillsTableProps {
   invoices: Invoice[];
 }
 
-export const BillsTable = ({ invoices }: BillsTableProps) => {
+export const BillsTable = ({ invoices: initialInvoices }: BillsTableProps) => {
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
+  const [invoices, setInvoices] = useState<Invoice[]>(initialInvoices);
   const { products } = useProducts();
+
+  const handleStatusChange = (invoiceId: string) => {
+    const updatedInvoices = invoices.map((invoice) =>
+      invoice.id === invoiceId
+        ? { ...invoice, status: "paid" as const }
+        : invoice
+    );
+    setInvoices(updatedInvoices.filter((invoice) => invoice.status !== "paid"));
+    storage.updateInvoiceStatus(invoiceId, "paid");
+    toast({
+      title: "Status Updated",
+      description: "Invoice has been marked as paid",
+    });
+  };
 
   if (selectedInvoice) {
     return (
       <div className="space-y-4">
-        <Button onClick={() => setSelectedInvoice(null)}>Back to Bills</Button>
+        <Button onClick={() => setSelectedInvoice(null)} className="mb-4">
+          Back to Bills
+        </Button>
         <InvoicePDF invoice={selectedInvoice} products={products} />
       </div>
     );
   }
 
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead>Date</TableHead>
-          <TableHead>Customer</TableHead>
-          <TableHead>Total</TableHead>
-          <TableHead>Status</TableHead>
-          <TableHead>Action</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {invoices.map((invoice) => (
-          <TableRow key={invoice.id} className="hover:bg-muted/50 transition-all">
-            <TableCell>{new Date(invoice.date).toLocaleDateString()}</TableCell>
-            <TableCell>{invoice.customerName}</TableCell>
-            <TableCell>₹{invoice.total.toFixed(2)}</TableCell>
-            <TableCell>{invoice.status}</TableCell>
-            <TableCell>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setSelectedInvoice(invoice)}
-                className="hover:bg-primary/90 transition-colors"
-              >
-                Download PDF
-              </Button>
-            </TableCell>
+    <div className="w-full overflow-auto">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-[100px]">Date</TableHead>
+            <TableHead>Customer</TableHead>
+            <TableHead className="text-right">Total</TableHead>
+            <TableHead className="text-center">Status</TableHead>
+            <TableHead className="text-right">Actions</TableHead>
           </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+        </TableHeader>
+        <TableBody>
+          {invoices.map((invoice) => (
+            <TableRow key={invoice.id} className="hover:bg-muted/50 transition-all">
+              <TableCell className="font-medium">
+                {new Date(invoice.date).toLocaleDateString()}
+              </TableCell>
+              <TableCell>{invoice.customerName}</TableCell>
+              <TableCell className="text-right">₹{invoice.total.toFixed(2)}</TableCell>
+              <TableCell className="text-center">
+                <span
+                  className={`px-2 py-1 rounded-full text-xs ${
+                    invoice.status === "pending"
+                      ? "bg-yellow-100 text-yellow-800"
+                      : "bg-green-100 text-green-800"
+                  }`}
+                >
+                  {invoice.status}
+                </span>
+              </TableCell>
+              <TableCell className="text-right">
+                <div className="flex justify-end gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setSelectedInvoice(invoice)}
+                    className="hover:bg-primary/90 transition-colors"
+                  >
+                    <Download className="w-4 h-4" />
+                  </Button>
+                  {invoice.status === "pending" && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleStatusChange(invoice.id)}
+                      className="hover:bg-green-500 hover:text-white transition-colors"
+                    >
+                      <Check className="w-4 h-4" />
+                    </Button>
+                  )}
+                </div>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
   );
 };
