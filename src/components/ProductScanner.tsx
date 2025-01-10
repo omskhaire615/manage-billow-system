@@ -21,7 +21,7 @@ export const ProductScanner = ({ onProductDetected }: ProductScannerProps) => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ 
         video: { 
-          facingMode: 'environment' // Prefer back camera if available
+          facingMode: 'environment'
         } 
       });
       
@@ -31,7 +31,6 @@ export const ProductScanner = ({ onProductDetected }: ProductScannerProps) => {
       }
       setIsScanning(true);
 
-      // Initialize the image classifier
       const imageClassifier = await pipeline(
         'image-classification',
         'onnx-community/mobilenetv4_conv_small.e2400_r224_in1k',
@@ -66,7 +65,6 @@ export const ProductScanner = ({ onProductDetected }: ProductScannerProps) => {
     }
 
     try {
-      // Create a canvas and draw the current video frame
       const canvas = document.createElement('canvas');
       canvas.width = videoRef.current.videoWidth;
       canvas.height = videoRef.current.videoHeight;
@@ -77,21 +75,13 @@ export const ProductScanner = ({ onProductDetected }: ProductScannerProps) => {
         return;
       }
 
-      // Draw the current video frame to the canvas
       ctx.drawImage(videoRef.current, 0, 0);
-
-      // Convert canvas to blob
-      const blob = await new Promise<Blob>((resolve) => {
-        canvas.toBlob(blob => {
-          if (blob) resolve(blob);
-        }, 'image/jpeg', 0.95);
-      });
-
-      // Create a File object from the blob
-      const file = new File([blob], 'captured-image.jpg', { type: 'image/jpeg' });
+      
+      // Convert canvas to data URL
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
       
       console.log('Attempting to classify image...');
-      const result = await classifier(file);
+      const result = await classifier(dataUrl);
       console.log('Classification result:', result);
 
       // Find a matching product based on the classification
