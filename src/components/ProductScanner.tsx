@@ -19,9 +19,16 @@ export const ProductScanner = ({ onProductDetected }: ProductScannerProps) => {
 
   const startScanning = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      // Request camera access immediately when starting scanner
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { 
+          facingMode: 'environment' // Prefer back camera if available
+        } 
+      });
+      
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
+        await videoRef.current.play(); // Ensure video starts playing
       }
       setIsScanning(true);
 
@@ -32,7 +39,10 @@ export const ProductScanner = ({ onProductDetected }: ProductScannerProps) => {
         { device: 'webgpu' }
       );
       setClassifier(imageClassifier);
+      
+      console.log('Camera and classifier initialized successfully');
     } catch (error) {
+      console.error('Error starting scanner:', error);
       toast({
         title: "Camera Error",
         description: "Could not access camera. Please check permissions.",
@@ -51,30 +61,41 @@ export const ProductScanner = ({ onProductDetected }: ProductScannerProps) => {
   };
 
   const captureImage = async () => {
-    if (!videoRef.current || !classifier) return;
+    if (!videoRef.current || !classifier) {
+      console.error('Video ref or classifier not ready');
+      return;
+    }
 
     const canvas = document.createElement('canvas');
     canvas.width = videoRef.current.videoWidth;
     canvas.height = videoRef.current.videoHeight;
     const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    if (!ctx) {
+      console.error('Could not get canvas context');
+      return;
+    }
 
     ctx.drawImage(videoRef.current, 0, 0);
     
     try {
       // Convert canvas to blob
-      const blob = await new Promise<Blob>((resolve) => {
-        canvas.toBlob((blob) => {
-          if (blob) resolve(blob);
-        }, 'image/jpeg');
+      const blob = await new Promise<Blob>((resolve, reject) => {
+        canvas.toBlob((b) => {
+          if (b) resolve(b);
+          else reject(new Error('Failed to create blob'));
+        }, 'image/jpeg', 0.95);
       });
 
-      // Create a File object from the blob
-      const imageFile = new File([blob], 'captured-image.jpg', { type: 'image/jpeg' });
+      // Create a URL from the blob for the classifier
+      const imageUrl = URL.createObjectURL(blob);
       
-      // Classify the captured image
-      const result = await classifier(imageFile);
+      // Classify the image using the URL
+      console.log('Attempting to classify image...');
+      const result = await classifier(imageUrl);
       console.log('Classification result:', result);
+      
+      // Clean up the URL
+      URL.revokeObjectURL(imageUrl);
       
       // Find a matching product based on the classification
       const matchedProduct = products.find(product => {
