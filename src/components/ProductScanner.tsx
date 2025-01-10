@@ -77,18 +77,18 @@ export const ProductScanner = ({ onProductDetected }: ProductScannerProps) => {
 
       ctx.drawImage(videoRef.current, 0, 0);
       
-      // Create an image element and set its source to the canvas data
-      const img = new Image();
-      img.src = canvas.toDataURL('image/jpeg', 0.95);
-      
-      // Wait for the image to load
-      await new Promise((resolve) => {
-        img.onload = resolve;
-      });
+      // Convert canvas to a blob URL
+      const blob = await new Promise<Blob>((resolve) => 
+        canvas.toBlob(resolve!, 'image/jpeg', 0.95)
+      );
+      const imageUrl = URL.createObjectURL(blob);
       
       console.log('Attempting to classify image...');
-      const result = await classifier(img);
+      const result = await classifier(imageUrl);
       console.log('Classification result:', result);
+
+      // Cleanup the URL after classification
+      URL.revokeObjectURL(imageUrl);
 
       // Find a matching product based on the classification
       const matchedProduct = products.find(product => {
