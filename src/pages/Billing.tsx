@@ -1,18 +1,15 @@
 import React, { useState } from "react";
-import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { storage } from "@/lib/storage";
-import { Invoice, Product } from "@/lib/types";
+import { Input } from "@/components/ui/input";
 import { useProducts } from "@/contexts/ProductContext";
 import { useToast } from "@/hooks/use-toast";
-import { Input } from "@/components/ui/input";
-import { LowStockAlert } from "@/components/LowStockAlert";
-import { InvoicePDF } from "@/components/InvoicePDF";
-import { ProductSearch } from "@/components/ProductSearch";
+import { storage } from "@/lib/storage";
+import { Invoice, Product } from "@/lib/types";
 import { BillingTable } from "@/components/BillingTable";
 import { ProductSelection } from "@/components/ProductSelection";
 import { BillsTable } from "@/components/BillsTable";
+import * as XLSX from 'xlsx';
 
 const Billing = () => {
   const { products, updateProduct } = useProducts();
@@ -23,25 +20,8 @@ const Billing = () => {
     { product: Product; quantity: number }[]
   >([]);
   const [customerName, setCustomerName] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
-  const [showPDF, setShowPDF] = useState<Invoice | null>(null);
-
-  const filteredProducts = products.filter((product) =>
-    product.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const addProductToInvoice = (productId: string, quantity: number) => {
-    const product = products.find((p) => p.id === productId);
-    if (product && quantity > 0 && quantity <= product.stock) {
-      setSelectedProducts([...selectedProducts, { product, quantity }]);
-    } else {
-      toast({
-        title: "Error",
-        description: "Invalid quantity or insufficient stock",
-        variant: "destructive",
-      });
-    }
-  };
+  const [customerAddress, setCustomerAddress] = useState("");
+  const [customerPhone, setCustomerPhone] = useState("");
 
   const calculateTotal = () => {
     return selectedProducts.reduce(
@@ -58,6 +38,37 @@ const Billing = () => {
         stock: product.stock - quantity,
       });
     }
+  };
+
+  const exportToExcel = (invoice: Invoice) => {
+    const invoiceProducts = invoice.items.map((item) => {
+      const product = products.find((p) => p.id === item.productId);
+      return {
+        "Product Name": product?.name || "",
+        "Quantity": item.quantity,
+        "Price": `₹${item.price}`,
+        "Total": `₹${item.price * item.quantity}`,
+      };
+    });
+
+    const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.json_to_sheet([
+      {
+        "Invoice ID": invoice.id,
+        "Customer Name": invoice.customerName,
+        "Customer Address": invoice.customerAddress || "N/A",
+        "Customer Phone": invoice.customerPhone || "N/A",
+        "Date": new Date(invoice.date).toLocaleDateString(),
+        "Status": invoice.status,
+      },
+      { "": "" }, // Empty row for spacing
+      ...invoiceProducts,
+      { "": "" }, // Empty row for spacing
+      { "Total Amount": `₹${invoice.total}` },
+    ]);
+
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Invoice");
+    XLSX.writeFile(workbook, `Invoice-${invoice.id}.xlsx`);
   };
 
   const createInvoice = () => {
@@ -77,6 +88,8 @@ const Billing = () => {
     const newInvoice: Invoice = {
       id: crypto.randomUUID(),
       customerName,
+      customerAddress,
+      customerPhone,
       items: selectedProducts.map(({ product, quantity }) => ({
         productId: product.id,
         quantity,
@@ -89,10 +102,12 @@ const Billing = () => {
 
     storage.saveInvoice(newInvoice);
     setInvoices(storage.getInvoices());
-    setShowPDF(newInvoice);
+    exportToExcel(newInvoice);
     setIsCreating(false);
     setSelectedProducts([]);
     setCustomerName("");
+    setCustomerAddress("");
+    setCustomerPhone("");
 
     toast({
       title: "Invoice created",
@@ -100,26 +115,14 @@ const Billing = () => {
     });
   };
 
-  if (showPDF) {
-    return (
-      <div className="space-y-4">
-        <Button onClick={() => setShowPDF(null)}>Back to Billing</Button>
-        <InvoicePDF invoice={showPDF} products={products} />
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-8">
-      <LowStockAlert />
-      
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-semibold text-gray-900">Billing</h1>
         <Button
           onClick={() => setIsCreating(true)}
           className="bg-sage-500 hover:bg-sage-600 transition-colors"
         >
-          <Plus className="w-4 h-4 mr-2" />
           New Invoice
         </Button>
       </div>
@@ -127,7 +130,7 @@ const Billing = () => {
       {!isCreating && (
         <Card className="p-6">
           <h2 className="text-xl font-semibold mb-4">Previous Bills</h2>
-          <BillsTable invoices={invoices} />
+          <BillsTable invoices={invoices} onExport={exportToExcel} />
         </Card>
       )}
 
@@ -135,23 +138,47 @@ const Billing = () => {
         <Card className="p-6">
           <h2 className="text-xl font-semibold mb-4">Create New Invoice</h2>
           <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Customer Name *
+                </label>
+                <Input
+                  value={customerName}
+                  onChange={(e) => setCustomerName(e.target.value)}
+                  className="w-full"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Phone Number
+                </label>
+                <Input
+                  value={customerPhone}
+                  onChange={(e) => setCustomerPhone(e.target.value)}
+                  className="w-full"
+                  type="tel"
+                />
+              </div>
+            </div>
             <div>
-              <label className="block text-sm font-medium mb-1">
-                Customer Name
-              </label>
+              <label className="block text-sm font-medium mb-1">Address</label>
               <Input
-                value={customerName}
-                onChange={(e) => setCustomerName(e.target.value)}
+                value={customerAddress}
+                onChange={(e) => setCustomerAddress(e.target.value)}
                 className="w-full"
-                required
               />
             </div>
 
-            <ProductSearch onSearch={setSearchQuery} />
-
             <ProductSelection
-              filteredProducts={filteredProducts}
-              addProductToInvoice={addProductToInvoice}
+              filteredProducts={products}
+              addProductToInvoice={(productId, quantity) => {
+                const product = products.find((p) => p.id === productId);
+                if (product) {
+                  setSelectedProducts([...selectedProducts, { product, quantity }]);
+                }
+              }}
             />
 
             <BillingTable
@@ -172,6 +199,8 @@ const Billing = () => {
                   setIsCreating(false);
                   setSelectedProducts([]);
                   setCustomerName("");
+                  setCustomerAddress("");
+                  setCustomerPhone("");
                 }}
               >
                 Cancel
