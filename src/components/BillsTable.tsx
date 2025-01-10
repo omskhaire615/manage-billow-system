@@ -17,9 +17,10 @@ import { Check, Download } from "lucide-react";
 
 interface BillsTableProps {
   invoices: Invoice[];
+  onExport?: (invoice: Invoice) => void;
 }
 
-export const BillsTable = ({ invoices: initialInvoices }: BillsTableProps) => {
+export const BillsTable = ({ invoices: initialInvoices, onExport }: BillsTableProps) => {
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [invoices, setInvoices] = useState<Invoice[]>(initialInvoices);
   const { products } = useProducts();
@@ -85,7 +86,7 @@ export const BillsTable = ({ invoices: initialInvoices }: BillsTableProps) => {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => setSelectedInvoice(invoice)}
+                    onClick={() => onExport?.(invoice)}
                     className="hover:bg-primary/90 transition-colors"
                   >
                     <Download className="w-4 h-4" />

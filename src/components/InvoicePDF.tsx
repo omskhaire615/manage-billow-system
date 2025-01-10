@@ -165,9 +165,9 @@ export const InvoicePDF = ({ invoice, products }: InvoicePDFProps) => {
                 <Text style={styles.label}>Name:</Text>
                 <Text style={styles.value}>{invoice.customerName}</Text>
                 <Text style={styles.label}>Address:</Text>
-                <Text style={styles.value}>-</Text>
+                <Text style={styles.value}>{invoice.customerAddress || "-"}</Text>
                 <Text style={styles.label}>Phone Number:</Text>
-                <Text style={styles.value}>-</Text>
+                <Text style={styles.value}>{invoice.customerPhone || "-"}</Text>
               </View>
               <View style={styles.rightInfo}>
                 <Text style={styles.label}>INVOICE</Text>
