@@ -62,8 +62,19 @@ export const ProductScanner = ({ onProductDetected }: ProductScannerProps) => {
     ctx.drawImage(videoRef.current, 0, 0);
     
     try {
+      // Convert canvas to blob
+      const blob = await new Promise<Blob>((resolve) => {
+        canvas.toBlob((blob) => {
+          if (blob) resolve(blob);
+        }, 'image/jpeg');
+      });
+
+      // Create a File object from the blob
+      const imageFile = new File([blob], 'captured-image.jpg', { type: 'image/jpeg' });
+      
       // Classify the captured image
-      const result = await classifier(canvas.toDataURL());
+      const result = await classifier(imageFile);
+      console.log('Classification result:', result);
       
       // Find a matching product based on the classification
       const matchedProduct = products.find(product => {
@@ -91,6 +102,7 @@ export const ProductScanner = ({ onProductDetected }: ProductScannerProps) => {
         });
       }
     } catch (error) {
+      console.error('Error processing image:', error);
       toast({
         title: "Error",
         description: "Failed to process the image.",
