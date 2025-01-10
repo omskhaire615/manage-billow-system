@@ -77,11 +77,17 @@ export const ProductScanner = ({ onProductDetected }: ProductScannerProps) => {
 
       ctx.drawImage(videoRef.current, 0, 0);
       
-      // Convert canvas to data URL
-      const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
+      // Create an image element and set its source to the canvas data
+      const img = new Image();
+      img.src = canvas.toDataURL('image/jpeg', 0.95);
+      
+      // Wait for the image to load
+      await new Promise((resolve) => {
+        img.onload = resolve;
+      });
       
       console.log('Attempting to classify image...');
-      const result = await classifier(dataUrl);
+      const result = await classifier(img);
       console.log('Classification result:', result);
 
       // Find a matching product based on the classification
