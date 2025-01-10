@@ -19,7 +19,6 @@ export const ProductScanner = ({ onProductDetected }: ProductScannerProps) => {
 
   const startScanning = async () => {
     try {
-      // Request camera access immediately when starting scanner
       const stream = await navigator.mediaDevices.getUserMedia({ 
         video: { 
           facingMode: 'environment' // Prefer back camera if available
@@ -28,7 +27,7 @@ export const ProductScanner = ({ onProductDetected }: ProductScannerProps) => {
       
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        await videoRef.current.play(); // Ensure video starts playing
+        await videoRef.current.play();
       }
       setIsScanning(true);
 
@@ -66,42 +65,31 @@ export const ProductScanner = ({ onProductDetected }: ProductScannerProps) => {
       return;
     }
 
-    const canvas = document.createElement('canvas');
-    canvas.width = videoRef.current.videoWidth;
-    canvas.height = videoRef.current.videoHeight;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) {
-      console.error('Could not get canvas context');
-      return;
-    }
-
-    ctx.drawImage(videoRef.current, 0, 0);
-    
     try {
-      // Convert canvas to blob
-      const blob = await new Promise<Blob>((resolve, reject) => {
-        canvas.toBlob((b) => {
-          if (b) resolve(b);
-          else reject(new Error('Failed to create blob'));
-        }, 'image/jpeg', 0.95);
-      });
+      // Create a canvas and draw the current video frame
+      const canvas = document.createElement('canvas');
+      canvas.width = videoRef.current.videoWidth;
+      canvas.height = videoRef.current.videoHeight;
+      const ctx = canvas.getContext('2d');
+      
+      if (!ctx) {
+        console.error('Could not get canvas context');
+        return;
+      }
 
-      // Create a URL from the blob for the classifier
-      const imageUrl = URL.createObjectURL(blob);
+      // Draw the current video frame to the canvas
+      ctx.drawImage(videoRef.current, 0, 0);
+
+      // Convert the canvas to a data URL
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.95);
       
-      // Classify the image using the URL
       console.log('Attempting to classify image...');
-      const result = await classifier(imageUrl);
+      const result = await classifier(dataUrl);
       console.log('Classification result:', result);
-      
-      // Clean up the URL
-      URL.revokeObjectURL(imageUrl);
-      
+
       // Find a matching product based on the classification
       const matchedProduct = products.find(product => {
-        // Convert the classification label to lowercase for comparison
         const label = result[0].label.toLowerCase();
-        // Check if the product name or description contains the detected object
         return (
           product.name.toLowerCase().includes(label) ||
           product.description.toLowerCase().includes(label)
