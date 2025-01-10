@@ -13,14 +13,13 @@ import { InvoicePDF } from "./InvoicePDF";
 import { useProducts } from "@/contexts/ProductContext";
 import { storage } from "@/lib/storage";
 import { toast } from "@/hooks/use-toast";
-import { Check, Download } from "lucide-react";
+import { Check, Eye } from "lucide-react";
 
 interface BillsTableProps {
   invoices: Invoice[];
-  onExport?: (invoice: Invoice) => void;
 }
 
-export const BillsTable = ({ invoices: initialInvoices, onExport }: BillsTableProps) => {
+export const BillsTable = ({ invoices: initialInvoices }: BillsTableProps) => {
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [invoices, setInvoices] = useState<Invoice[]>(initialInvoices);
   const { products } = useProducts();
@@ -86,10 +85,10 @@ export const BillsTable = ({ invoices: initialInvoices, onExport }: BillsTablePr
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => onExport?.(invoice)}
+                    onClick={() => setSelectedInvoice(invoice)}
                     className="hover:bg-primary/90 transition-colors"
                   >
-                    <Download className="w-4 h-4" />
+                    <Eye className="w-4 h-4" />
                   </Button>
                   {invoice.status === "pending" && (
                     <Button
