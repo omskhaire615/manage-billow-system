@@ -9,7 +9,8 @@ import { Invoice, Product } from "@/lib/types";
 import { BillingTable } from "@/components/BillingTable";
 import { BillsTable } from "@/components/BillsTable";
 import { ProductSelection } from "@/components/ProductSelection";
-import * as XLSX from 'xlsx';
+import { pdf } from '@react-pdf/renderer';
+import { InvoicePDF } from "@/components/InvoicePDF";
 
 const Billing = () => {
   const { products, updateProduct } = useProducts();
@@ -49,38 +50,28 @@ const Billing = () => {
     }
   };
 
-  const exportToExcel = (invoice: Invoice) => {
-    const invoiceProducts = invoice.items.map((item) => {
-      const product = products.find((p) => p.id === item.productId);
-      return {
-        "Product Name": product?.name || "",
-        "Quantity": item.quantity,
-        "Price": `₹${item.price}`,
-        "Total": `₹${item.price * item.quantity}`,
-      };
-    });
-
-    const workbook = XLSX.utils.book_new();
-    const worksheet = XLSX.utils.json_to_sheet([
-      {
-        "Invoice ID": invoice.id,
-        "Customer Name": invoice.customerName,
-        "Customer Address": invoice.customerAddress || "N/A",
-        "Customer Phone": invoice.customerPhone || "N/A",
-        "Date": new Date(invoice.date).toLocaleDateString(),
-        "Status": invoice.status,
-      },
-      { "": "" },
-      ...invoiceProducts,
-      { "": "" },
-      { "Total Amount": `₹${invoice.total}` },
-    ]);
-
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Invoice");
-    XLSX.writeFile(workbook, `Invoice-${invoice.id}.xlsx`);
+  const downloadPDF = async (invoice: Invoice) => {
+    try {
+      const blob = await pdf(
+        <InvoicePDF invoice={invoice} products={products} />
+      ).toBlob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Invoice-${invoice.id}.pdf`;
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast({
+        title: "Error",
+        description: "Failed to generate PDF",
+        variant: "destructive",
+      });
+    }
   };
 
-  const createInvoice = () => {
+  const createInvoice = async () => {
     if (!customerName || selectedProducts.length === 0) {
       toast({
         title: "Error",
@@ -111,7 +102,7 @@ const Billing = () => {
 
     storage.saveInvoice(newInvoice);
     setInvoices(storage.getInvoices().filter(invoice => invoice.status === "pending"));
-    exportToExcel(newInvoice);
+    await downloadPDF(newInvoice);
     setIsCreating(false);
     setSelectedProducts([]);
     setCustomerName("");
@@ -120,7 +111,7 @@ const Billing = () => {
 
     toast({
       title: "Invoice created",
-      description: `Invoice for ${customerName} has been created successfully.`,
+      description: `Invoice for ${customerName} has been created and downloaded.`,
     });
   };
 
