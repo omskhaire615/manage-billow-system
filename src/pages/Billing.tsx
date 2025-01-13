@@ -24,8 +24,6 @@ const Billing = () => {
   const [customerName, setCustomerName] = useState("");
   const [customerAddress, setCustomerAddress] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
-  const [gstNumber, setGstNumber] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("cash");
 
   const handleProductSelect = (productId: string) => {
     const product = products.find((p) => p.id === productId);
@@ -101,8 +99,6 @@ const Billing = () => {
       customerName,
       customerAddress,
       customerPhone,
-      gstNumber,
-      paymentMethod,
       items: selectedProducts.map(({ product, quantity }) => ({
         productId: product.id,
         quantity,
@@ -121,8 +117,6 @@ const Billing = () => {
     setCustomerName("");
     setCustomerAddress("");
     setCustomerPhone("");
-    setGstNumber("");
-    setPaymentMethod("cash");
 
     toast({
       title: "Invoice created",
@@ -132,96 +126,76 @@ const Billing = () => {
 
   return (
     <div className="space-y-8">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center animate-fadeIn">
         <h1 className="text-3xl font-semibold text-gray-900">Billing</h1>
         <Button
           onClick={() => setIsCreating(true)}
-          className="bg-sage-500 hover:bg-sage-600 transition-colors"
+          className="bg-sage-500 hover:bg-sage-600 transition-all duration-300 transform hover:scale-105"
         >
           New Invoice
         </Button>
       </div>
 
       {!isCreating && (
-        <Card className="p-6">
+        <Card className="p-6 animate-fadeIn">
           <h2 className="text-xl font-semibold mb-4">Pending Bills</h2>
           <BillsTable invoices={invoices} />
         </Card>
       )}
 
       {isCreating && (
-        <Card className="p-6">
+        <Card className="p-6 animate-slideIn">
           <h2 className="text-xl font-semibold mb-4">Create New Invoice</h2>
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
+              <div className="transition-all duration-200 hover:transform hover:scale-[1.02]">
                 <label className="block text-sm font-medium mb-1">
                   Customer Name *
                 </label>
                 <Input
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
-                  className="w-full"
+                  className="w-full transition-all duration-200 hover:border-sage-500"
                   required
                 />
               </div>
-              <div>
+              <div className="transition-all duration-200 hover:transform hover:scale-[1.02]">
                 <label className="block text-sm font-medium mb-1">
                   Phone Number
                 </label>
                 <Input
                   value={customerPhone}
                   onChange={(e) => setCustomerPhone(e.target.value)}
-                  className="w-full"
+                  className="w-full transition-all duration-200 hover:border-sage-500"
                   type="tel"
                 />
               </div>
             </div>
             
-            <div>
+            <div className="transition-all duration-200 hover:transform hover:scale-[1.02]">
               <label className="block text-sm font-medium mb-1">Address</label>
               <Input
                 value={customerAddress}
                 onChange={(e) => setCustomerAddress(e.target.value)}
-                className="w-full"
+                className="w-full transition-all duration-200 hover:border-sage-500"
               />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-1">GST Number</label>
-                <Input
-                  value={gstNumber}
-                  onChange={(e) => setGstNumber(e.target.value)}
-                  className="w-full"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1">Payment Method</label>
-                <select
-                  value={paymentMethod}
-                  onChange={(e) => setPaymentMethod(e.target.value)}
-                  className="w-full rounded-md border border-input bg-background px-3 py-2"
-                >
-                  <option value="cash">Cash</option>
-                  <option value="upi">UPI</option>
-                  <option value="card">Card</option>
-                  <option value="bank_transfer">Bank Transfer</option>
-                </select>
-              </div>
+            <div className="transition-all duration-200 hover:transform hover:scale-[1.02]">
+              <ProductSelection 
+                products={products.filter(p => p.stock > 0)} 
+                onProductSelect={handleProductSelect}
+              />
             </div>
 
-            <ProductSelection 
-              products={products.filter(p => p.stock > 0)} 
-              onProductSelect={handleProductSelect}
-            />
+            <div className="animate-fadeIn">
+              <BillingTable
+                selectedProducts={selectedProducts}
+                setSelectedProducts={setSelectedProducts}
+              />
+            </div>
 
-            <BillingTable
-              selectedProducts={selectedProducts}
-              setSelectedProducts={setSelectedProducts}
-            />
-
-            <div className="mt-4 text-right">
+            <div className="mt-4 text-right animate-fadeIn">
               <p className="text-lg font-semibold">
                 Total: ₹{calculateTotal().toFixed(2)}
               </p>
@@ -236,15 +210,14 @@ const Billing = () => {
                   setCustomerName("");
                   setCustomerAddress("");
                   setCustomerPhone("");
-                  setGstNumber("");
-                  setPaymentMethod("cash");
                 }}
+                className="hover:bg-sage-50 transition-all duration-300"
               >
                 Cancel
               </Button>
               <Button
                 onClick={createInvoice}
-                className="bg-sage-500 hover:bg-sage-600"
+                className="bg-sage-500 hover:bg-sage-600 transition-all duration-300 transform hover:scale-105"
               >
                 Create Invoice
               </Button>
