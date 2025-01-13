@@ -8,7 +8,6 @@ import { storage } from "@/lib/storage";
 import { Invoice, Product } from "@/lib/types";
 import { BillingTable } from "@/components/BillingTable";
 import { BillsTable } from "@/components/BillsTable";
-import { ProductScanner } from "@/components/ProductScanner";
 import * as XLSX from 'xlsx';
 
 const Billing = () => {
@@ -22,10 +21,6 @@ const Billing = () => {
   const [customerName, setCustomerName] = useState("");
   const [customerAddress, setCustomerAddress] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
-
-  const handleProductDetected = (product: Product) => {
-    setSelectedProducts([...selectedProducts, { product, quantity: 1 }]);
-  };
 
   const calculateTotal = () => {
     return selectedProducts.reduce(
@@ -142,8 +137,6 @@ const Billing = () => {
         <Card className="p-6">
           <h2 className="text-xl font-semibold mb-4">Create New Invoice</h2>
           <div className="space-y-4">
-            <ProductScanner onProductDetected={handleProductDetected} />
-            
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium mb-1">
