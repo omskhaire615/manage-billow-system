@@ -16,8 +16,6 @@ export interface Invoice {
   customerName: string;
   customerAddress?: string;
   customerPhone?: string;
-  gstNumber?: string;
-  paymentMethod: string;
   items: {
     productId: string;
     quantity: number;

@@ -167,8 +167,6 @@ export const InvoicePDF = ({ invoice, products }: InvoicePDFProps) => {
                 <Text style={styles.value}>{invoice.customerAddress || "-"}</Text>
                 <Text style={styles.label}>Phone Number:</Text>
                 <Text style={styles.value}>{invoice.customerPhone || "-"}</Text>
-                <Text style={styles.label}>GST Number:</Text>
-                <Text style={styles.value}>{invoice.gstNumber || "-"}</Text>
               </View>
               <View style={styles.rightInfo}>
                 <Text style={styles.label}>INVOICE</Text>
@@ -177,10 +175,6 @@ export const InvoicePDF = ({ invoice, products }: InvoicePDFProps) => {
                 <Text style={styles.label}>Invoice Date:</Text>
                 <Text style={styles.value}>
                   {new Date(invoice.date).toLocaleDateString()}
-                </Text>
-                <Text style={styles.label}>Payment Method:</Text>
-                <Text style={styles.value}>
-                  {invoice.paymentMethod.toUpperCase()}
                 </Text>
               </View>
             </View>

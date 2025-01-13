@@ -70,9 +70,9 @@ const Billing = () => {
         "Date": new Date(invoice.date).toLocaleDateString(),
         "Status": invoice.status,
       },
-      { "": "" }, // Empty row for spacing
+      { "": "" },
       ...invoiceProducts,
-      { "": "" }, // Empty row for spacing
+      { "": "" },
       { "Total Amount": `₹${invoice.total}` },
     ]);
 
