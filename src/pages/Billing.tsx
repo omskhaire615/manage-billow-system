@@ -61,6 +61,11 @@ const Billing = () => {
       link.download = `Invoice-${invoice.id}.pdf`;
       link.click();
       URL.revokeObjectURL(url);
+      
+      toast({
+        title: "Success",
+        description: "Invoice PDF has been downloaded",
+      });
     } catch (error) {
       console.error('Error generating PDF:', error);
       toast({
