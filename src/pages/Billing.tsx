@@ -9,7 +9,6 @@ import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
 import { LowStockAlert } from "@/components/LowStockAlert";
 import { InvoicePDF } from "@/components/InvoicePDF";
-import { ProductSearch } from "@/components/ProductSearch";
 import { BillingTable } from "@/components/BillingTable";
 import { ProductSelection } from "@/components/ProductSelection";
 import { BillsTable } from "@/components/BillsTable";
@@ -23,12 +22,9 @@ const Billing = () => {
     { product: Product; quantity: number }[]
   >([]);
   const [customerName, setCustomerName] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [customerAddress, setCustomerAddress] = useState("");
+  const [customerPhone, setCustomerPhone] = useState("");
   const [showPDF, setShowPDF] = useState<Invoice | null>(null);
-
-  const filteredProducts = products.filter((product) =>
-    product.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
 
   const addProductToInvoice = (productId: string, quantity: number) => {
     const product = products.find((p) => p.id === productId);
@@ -61,7 +57,7 @@ const Billing = () => {
   };
 
   const createInvoice = () => {
-    if (!customerName || selectedProducts.length === 0) {
+    if (!customerName || !customerAddress || !customerPhone || selectedProducts.length === 0) {
       toast({
         title: "Error",
         description: "Please fill in all required fields",
@@ -77,6 +73,8 @@ const Billing = () => {
     const newInvoice: Invoice = {
       id: crypto.randomUUID(),
       customerName,
+      address: customerAddress,
+      phone: customerPhone,
       items: selectedProducts.map(({ product, quantity }) => ({
         productId: product.id,
         quantity,
@@ -93,6 +91,8 @@ const Billing = () => {
     setIsCreating(false);
     setSelectedProducts([]);
     setCustomerName("");
+    setCustomerAddress("");
+    setCustomerPhone("");
 
     toast({
       title: "Invoice created",
@@ -127,7 +127,7 @@ const Billing = () => {
       {!isCreating && (
         <Card className="p-6">
           <h2 className="text-xl font-semibold mb-4">Previous Bills</h2>
-          <BillsTable invoices={invoices} />
+          <BillsTable invoices={invoices.filter(inv => inv.status !== 'paid')} />
         </Card>
       )}
 
@@ -135,22 +135,45 @@ const Billing = () => {
         <Card className="p-6">
           <h2 className="text-xl font-semibold mb-4">Create New Invoice</h2>
           <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium mb-1">
-                Customer Name
-              </label>
-              <Input
-                value={customerName}
-                onChange={(e) => setCustomerName(e.target.value)}
-                className="w-full"
-                required
-              />
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Customer Name
+                </label>
+                <Input
+                  value={customerName}
+                  onChange={(e) => setCustomerName(e.target.value)}
+                  className="w-full"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Address
+                </label>
+                <Input
+                  value={customerAddress}
+                  onChange={(e) => setCustomerAddress(e.target.value)}
+                  className="w-full"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium mb-1">
+                  Phone Number
+                </label>
+                <Input
+                  value={customerPhone}
+                  onChange={(e) => setCustomerPhone(e.target.value)}
+                  className="w-full"
+                  required
+                  type="tel"
+                />
+              </div>
             </div>
 
-            <ProductSearch onSearch={setSearchQuery} />
-
             <ProductSelection
-              filteredProducts={filteredProducts}
+              filteredProducts={products}
               addProductToInvoice={addProductToInvoice}
             />
 
@@ -172,6 +195,8 @@ const Billing = () => {
                   setIsCreating(false);
                   setSelectedProducts([]);
                   setCustomerName("");
+                  setCustomerAddress("");
+                  setCustomerPhone("");
                 }}
               >
                 Cancel

@@ -6,6 +6,7 @@ import {
   View,
   StyleSheet,
   PDFViewer,
+  Image,
 } from "@react-pdf/renderer";
 import { Invoice } from "@/lib/types";
 
@@ -18,11 +19,23 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     borderBottom: 2,
     paddingBottom: 10,
+    alignItems: 'center',
+  },
+  logo: {
+    width: 100,
+    height: 100,
+    marginBottom: 10,
   },
   title: {
     fontSize: 24,
     textAlign: "center",
     fontWeight: "bold",
+    marginBottom: 5,
+  },
+  subtitle: {
+    fontSize: 14,
+    textAlign: "center",
+    color: "#666",
     marginBottom: 5,
   },
   address: {
@@ -95,14 +108,24 @@ export const InvoicePDF = ({ invoice, products }: InvoicePDFProps) => {
       <Document>
         <Page size="A4" style={styles.page}>
           <View style={styles.header}>
+            <Image
+              src="/lovable-uploads/5083834e-2791-4089-8654-07925c723b5c.png"
+              style={styles.logo}
+            />
             <Text style={styles.title}>OM TRADERS</Text>
+            <Text style={styles.subtitle}>Hardware, Electronics and general store</Text>
             <Text style={styles.address}>
               Nandurdi, Devpur-Panchkeshwer Road 422308
+            </Text>
+            <Text style={styles.address}>
+              Contact: +91 9326070047 / 9689326627
             </Text>
           </View>
 
           <View style={styles.customerInfo}>
             <Text style={styles.label}>Name: {invoice.customerName}</Text>
+            <Text style={styles.label}>Address: {invoice.address}</Text>
+            <Text style={styles.label}>Phone: {invoice.phone}</Text>
             <Text style={styles.label}>
               Date: {new Date(invoice.date).toLocaleDateString()}
             </Text>
@@ -139,7 +162,7 @@ export const InvoicePDF = ({ invoice, products }: InvoicePDFProps) => {
           </View>
 
           <View style={styles.footer}>
-            <Text>MO.NO : 9326070047 / 9689326627</Text>
+            <Text>Thank you for your business!</Text>
           </View>
         </Page>
       </Document>
