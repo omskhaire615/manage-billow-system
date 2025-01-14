@@ -9,6 +9,7 @@ import { Invoice, Product } from "@/lib/types";
 import { BillingTable } from "@/components/BillingTable";
 import { BillsTable } from "@/components/BillsTable";
 import { ProductSelection } from "@/components/ProductSelection";
+import { pdf } from '@react-pdf/renderer';
 import { InvoicePDF } from "@/components/InvoicePDF";
 
 const Billing = () => {
@@ -24,8 +25,6 @@ const Billing = () => {
   const [customerName, setCustomerName] = useState("");
   const [customerAddress, setCustomerAddress] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
-  const [showPreview, setShowPreview] = useState(false);
-  const [currentInvoice, setCurrentInvoice] = useState<Invoice | null>(null);
 
   const handleProductSelect = (productId: string) => {
     const product = products.find((p) => p.id === productId);
@@ -51,7 +50,33 @@ const Billing = () => {
     }
   };
 
-  const createInvoice = () => {
+  const downloadPDF = async (invoice: Invoice) => {
+    try {
+      const blob = await pdf(
+        <InvoicePDF invoice={invoice} products={products} />
+      ).toBlob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `Invoice-${invoice.id}.pdf`;
+      link.click();
+      URL.revokeObjectURL(url);
+      
+      toast({
+        title: "Success",
+        description: "Invoice PDF has been downloaded",
+      });
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      toast({
+        title: "Error",
+        description: "Failed to generate PDF",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const createInvoice = async () => {
     if (!customerName || selectedProducts.length === 0) {
       toast({
         title: "Error",
@@ -82,8 +107,7 @@ const Billing = () => {
 
     storage.saveInvoice(newInvoice);
     setInvoices(storage.getInvoices().filter(invoice => invoice.status === "pending"));
-    setCurrentInvoice(newInvoice);
-    setShowPreview(true);
+    await downloadPDF(newInvoice);
     setIsCreating(false);
     setSelectedProducts([]);
     setCustomerName("");
@@ -92,7 +116,7 @@ const Billing = () => {
 
     toast({
       title: "Invoice created",
-      description: `Invoice for ${customerName} has been created.`,
+      description: `Invoice for ${customerName} has been created and downloaded.`,
     });
   };
 
@@ -101,41 +125,17 @@ const Billing = () => {
       <div className="flex justify-between items-center animate-fadeIn">
         <h1 className="text-3xl font-semibold text-gray-900">Billing</h1>
         <Button
-          onClick={() => {
-            setIsCreating(true);
-            setShowPreview(false);
-          }}
+          onClick={() => setIsCreating(true)}
           className="bg-sage-500 hover:bg-sage-600 transition-all duration-300 transform hover:scale-105"
         >
           New Invoice
         </Button>
       </div>
 
-      {!isCreating && !showPreview && (
+      {!isCreating && (
         <Card className="p-6 animate-fadeIn">
           <h2 className="text-xl font-semibold mb-4">Pending Bills</h2>
-          <BillsTable invoices={invoices} onViewBill={(invoice) => {
-            setCurrentInvoice(invoice);
-            setShowPreview(true);
-          }} />
-        </Card>
-      )}
-
-      {showPreview && currentInvoice && (
-        <Card className="p-6 animate-fadeIn">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">Bill Preview</h2>
-            <Button
-              variant="outline"
-              onClick={() => setShowPreview(false)}
-              className="hover:bg-sage-50 transition-all duration-300"
-            >
-              Back to List
-            </Button>
-          </div>
-          <div className="border rounded-lg">
-            <InvoicePDF invoice={currentInvoice} products={products} />
-          </div>
+          <BillsTable invoices={invoices} />
         </Card>
       )}
 
