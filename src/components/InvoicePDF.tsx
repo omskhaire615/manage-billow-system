@@ -13,71 +13,60 @@ const styles = StyleSheet.create({
   page: {
     padding: 30,
     fontSize: 12,
-  },
-  headerStrip: {
-    height: 40,
-    backgroundColor: "#4A1010",
-    flexDirection: "row",
-    marginBottom: 20,
-  },
-  redStrip: {
-    backgroundColor: "#ea384c",
-    width: "30%",
-    transform: "skewX(-20deg)",
-    marginLeft: -20,
+    backgroundColor: "#ffffff",
   },
   header: {
     marginBottom: 20,
     textAlign: "center",
+    borderBottom: 2,
+    borderColor: "#000000",
+    paddingBottom: 10,
   },
   title: {
-    fontSize: 24,
+    fontSize: 32,
     marginBottom: 5,
-    color: "#ea384c",
+    fontWeight: "bold",
   },
   address: {
     fontSize: 12,
-    color: "#333333",
+    marginBottom: 10,
+  },
+  contact: {
+    fontSize: 10,
+    marginTop: 5,
+    borderTop: 2,
+    borderColor: "#000000",
+    paddingTop: 10,
+  },
+  customerInfo: {
+    marginTop: 20,
     marginBottom: 20,
-  },
-  infoContainer: {
-    flexDirection: "row",
-    marginBottom: 20,
-    borderColor: "#ea384c",
-    borderWidth: 1,
-  },
-  leftInfo: {
-    width: "50%",
-    padding: 8,
-    borderRightColor: "#ea384c",
-    borderRightWidth: 1,
-  },
-  rightInfo: {
-    width: "50%",
-    padding: 8,
   },
   label: {
-    fontSize: 10,
-    marginBottom: 4,
+    fontSize: 12,
+    marginBottom: 10,
   },
   value: {
     fontSize: 11,
+    marginLeft: 10,
   },
   tableContainer: {
+    marginTop: 20,
     marginBottom: 20,
   },
   tableHeader: {
     flexDirection: "row",
-    backgroundColor: "#f8f8f8",
-    borderBottomColor: "#ea384c",
     borderBottomWidth: 1,
-    padding: 8,
+    borderBottomColor: "#000000",
+    paddingBottom: 5,
+    paddingTop: 5,
   },
   tableRow: {
     flexDirection: "row",
-    borderBottomColor: "#ea384c",
     borderBottomWidth: 0.5,
-    padding: 8,
+    borderBottomColor: "#000000",
+    paddingBottom: 5,
+    paddingTop: 5,
   },
   slNoCell: {
     width: "10%",
@@ -100,31 +89,28 @@ const styles = StyleSheet.create({
   totalRow: {
     flexDirection: "row",
     justifyContent: "flex-end",
-    padding: 8,
-    borderTopColor: "#ea384c",
+    marginTop: 10,
     borderTopWidth: 1,
+    borderTopColor: "#000000",
+    paddingTop: 5,
   },
   rupeesInWords: {
     marginTop: 20,
-    padding: 8,
-    borderColor: "#ea384c",
-    borderWidth: 1,
-  },
-  termsContainer: {
-    marginTop: 20,
+    marginBottom: 20,
   },
   signatureContainer: {
     marginTop: 40,
     alignItems: "flex-end",
-    paddingRight: 30,
   },
-  footerStrip: {
-    height: 40,
-    backgroundColor: "#4A1010",
-    flexDirection: "row",
+  footer: {
     position: "absolute",
-    bottom: 0,
-    width: "100%",
+    bottom: 30,
+    left: 30,
+    right: 30,
+    textAlign: "center",
+    borderTop: 2,
+    borderColor: "#000000",
+    paddingTop: 10,
   },
 });
 
@@ -178,40 +164,44 @@ export const InvoicePDF = ({ invoice, products }: InvoicePDFProps) => {
     <PDFViewer style={{ width: "100%", height: "600px" }}>
       <Document>
         <Page size="A4" style={styles.page}>
-          <View style={styles.headerStrip}>
-            <View style={styles.redStrip} />
-          </View>
-          
           <View style={styles.header}>
             <Text style={styles.title}>OM TRADERS</Text>
-            <Text style={styles.address}>nanduedi, niphad 422308</Text>
+            <Text style={styles.address}>
+              Nandurdi, Devpur-Panchkeshwer Road 422308
+            </Text>
+            <Text style={styles.address}>
+              Hardware, Electronics and general store
+            </Text>
           </View>
 
-          <View style={styles.infoContainer}>
-            <View style={styles.leftInfo}>
-              <Text style={styles.label}>Name:</Text>
-              <Text style={styles.value}>{invoice.customerName}</Text>
-              <Text style={styles.label}>Address:</Text>
+          <View style={styles.customerInfo}>
+            <Text style={styles.label}>
+              Name: <Text style={styles.value}>{invoice.customerName}</Text>
+            </Text>
+            <Text style={styles.label}>
+              Address:{" "}
               <Text style={styles.value}>{invoice.customerAddress || "-"}</Text>
-              <Text style={styles.label}>Phone Number:</Text>
+            </Text>
+            <Text style={styles.label}>
+              Phone Number:{" "}
               <Text style={styles.value}>{invoice.customerPhone || "-"}</Text>
-            </View>
-            <View style={styles.rightInfo}>
-              <Text style={styles.label}>INVOICE</Text>
-              <Text style={styles.label}>Invoice No:</Text>
-              <Text style={styles.value}>{invoice.id}</Text>
-              <Text style={styles.label}>Invoice Date:</Text>
+            </Text>
+            <Text style={styles.label}>
+              Invoice No: <Text style={styles.value}>{invoice.id}</Text>
+            </Text>
+            <Text style={styles.label}>
+              Date:{" "}
               <Text style={styles.value}>
                 {new Date(invoice.date).toLocaleDateString()}
               </Text>
-            </View>
+            </Text>
           </View>
 
           <View style={styles.tableContainer}>
             <View style={styles.tableHeader}>
-              <Text style={styles.slNoCell}>Sl.No.</Text>
+              <Text style={styles.slNoCell}>Sr.No.</Text>
               <Text style={styles.descriptionCell}>Description</Text>
-              <Text style={styles.qtyCell}>Qty.</Text>
+              <Text style={styles.qtyCell}>Qty</Text>
               <Text style={styles.rateCell}>Rate</Text>
               <Text style={styles.amountCell}>Amount</Text>
             </View>
@@ -242,18 +232,12 @@ export const InvoicePDF = ({ invoice, products }: InvoicePDFProps) => {
             <Text>Amount in words: {numberToWords(invoice.total)}</Text>
           </View>
 
-          <View style={styles.termsContainer}>
-            <Text style={styles.label}>Terms & Conditions:</Text>
-            <Text>1. Goods once sold will not be taken back</Text>
-            <Text>2. Payment should be made at the time of delivery</Text>
-          </View>
-
           <View style={styles.signatureContainer}>
             <Text>Authorized Signatory</Text>
           </View>
 
-          <View style={styles.footerStrip}>
-            <View style={[styles.redStrip, { marginLeft: "auto" }]} />
+          <View style={styles.footer}>
+            <Text>MO.NO : 9326070047 / 9689326627</Text>
           </View>
         </Page>
       </Document>
