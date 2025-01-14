@@ -16,101 +16,105 @@ const styles = StyleSheet.create({
     backgroundColor: "#ffffff",
   },
   header: {
-    marginBottom: 20,
-    textAlign: "center",
+    marginBottom: 30,
     borderBottom: 2,
     borderColor: "#000000",
-    paddingBottom: 10,
   },
   title: {
-    fontSize: 32,
-    marginBottom: 5,
+    fontSize: 36,
     fontWeight: "bold",
-  },
-  address: {
-    fontSize: 12,
+    textAlign: "center",
+    fontFamily: "Helvetica-Bold",
     marginBottom: 10,
   },
-  contact: {
-    fontSize: 10,
-    marginTop: 5,
-    borderTop: 2,
-    borderColor: "#000000",
-    paddingTop: 10,
+  subtitle: {
+    fontSize: 12,
+    textAlign: "center",
+    marginBottom: 5,
   },
   customerInfo: {
     marginTop: 20,
-    marginBottom: 20,
+    marginBottom: 30,
   },
   label: {
     fontSize: 12,
     marginBottom: 10,
+    fontFamily: "Helvetica-Bold",
   },
   value: {
     fontSize: 11,
-    marginLeft: 10,
+    marginLeft: 5,
+    fontFamily: "Helvetica",
   },
   tableContainer: {
     marginTop: 20,
     marginBottom: 20,
+    borderTop: 1,
+    borderColor: "#000000",
   },
   tableHeader: {
     flexDirection: "row",
     borderBottomWidth: 1,
     borderBottomColor: "#000000",
-    paddingBottom: 5,
-    paddingTop: 5,
+    paddingVertical: 8,
+    backgroundColor: "#f5f5f5",
   },
   tableRow: {
     flexDirection: "row",
-    borderBottomWidth: 0.5,
+    borderBottomWidth: 1,
     borderBottomColor: "#000000",
-    paddingBottom: 5,
-    paddingTop: 5,
+    paddingVertical: 8,
   },
   slNoCell: {
     width: "10%",
+    paddingHorizontal: 8,
   },
   descriptionCell: {
     width: "40%",
+    paddingHorizontal: 8,
   },
   qtyCell: {
     width: "15%",
     textAlign: "center",
+    paddingHorizontal: 8,
   },
   rateCell: {
     width: "15%",
     textAlign: "right",
+    paddingHorizontal: 8,
   },
   amountCell: {
     width: "20%",
     textAlign: "right",
+    paddingHorizontal: 8,
   },
   totalRow: {
     flexDirection: "row",
     justifyContent: "flex-end",
-    marginTop: 10,
+    paddingTop: 8,
     borderTopWidth: 1,
     borderTopColor: "#000000",
-    paddingTop: 5,
-  },
-  rupeesInWords: {
-    marginTop: 20,
-    marginBottom: 20,
-  },
-  signatureContainer: {
-    marginTop: 40,
-    alignItems: "flex-end",
   },
   footer: {
     position: "absolute",
     bottom: 30,
-    left: 30,
-    right: 30,
+    left: 0,
+    right: 0,
     textAlign: "center",
     borderTop: 2,
+    borderBottom: 2,
     borderColor: "#000000",
-    paddingTop: 10,
+    paddingVertical: 8,
+  },
+  footerText: {
+    fontSize: 10,
+    textAlign: "center",
+  },
+  signatureContainer: {
+    position: "absolute",
+    bottom: 60,
+    right: 30,
+    textAlign: "center",
   },
 });
 
@@ -165,11 +169,11 @@ export const InvoicePDF = ({ invoice, products }: InvoicePDFProps) => {
       <Document>
         <Page size="A4" style={styles.page}>
           <View style={styles.header}>
-            <Text style={styles.title}>OM TRADERS</Text>
-            <Text style={styles.address}>
+            <Text style={styles.subtitle}>
               Nandurdi, Devpur-Panchkeshwer Road 422308
             </Text>
-            <Text style={styles.address}>
+            <Text style={styles.title}>OM TRADERS</Text>
+            <Text style={styles.subtitle}>
               Hardware, Electronics and general store
             </Text>
           </View>
@@ -228,16 +232,14 @@ export const InvoicePDF = ({ invoice, products }: InvoicePDFProps) => {
             </View>
           </View>
 
-          <View style={styles.rupeesInWords}>
-            <Text>Amount in words: {numberToWords(invoice.total)}</Text>
-          </View>
-
           <View style={styles.signatureContainer}>
             <Text>Authorized Signatory</Text>
           </View>
 
           <View style={styles.footer}>
-            <Text>MO.NO : 9326070047 / 9689326627</Text>
+            <Text style={styles.footerText}>
+              MO.NO : 9326070047 / 9689326627
+            </Text>
           </View>
         </Page>
       </Document>
