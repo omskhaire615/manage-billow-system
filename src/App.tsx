@@ -24,26 +24,28 @@ function App() {
   const isMobile = useIsMobile();
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <ProductProvider>
-        <TooltipProvider>
-          <BrowserRouter>
-            <div className="flex min-h-screen bg-gray-50">
-              <Navigation />
-              <main className={`flex-1 p-4 md:p-8 animate-fadeIn ${isMobile ? 'ml-0' : 'ml-64'}`}>
-                <Routes>
-                  <Route path="/" element={<Dashboard />} />
-                  <Route path="/products" element={<Products />} />
-                  <Route path="/billing" element={<Billing />} />
-                </Routes>
-              </main>
-            </div>
-          </BrowserRouter>
-          <Toaster />
-          <SonnerToaster />
-        </TooltipProvider>
-      </ProductProvider>
-    </QueryClientProvider>
+    <React.StrictMode>
+      <QueryClientProvider client={queryClient}>
+        <ProductProvider>
+          <TooltipProvider>
+            <BrowserRouter>
+              <div className="flex min-h-screen bg-gray-50">
+                <Navigation />
+                <main className={`flex-1 p-4 md:p-8 animate-fadeIn ${isMobile ? 'ml-0' : 'ml-64'}`}>
+                  <Routes>
+                    <Route path="/" element={<Dashboard />} />
+                    <Route path="/products" element={<Products />} />
+                    <Route path="/billing" element={<Billing />} />
+                  </Routes>
+                </main>
+              </div>
+            </BrowserRouter>
+            <Toaster />
+            <SonnerToaster />
+          </TooltipProvider>
+        </ProductProvider>
+      </QueryClientProvider>
+    </React.StrictMode>
   );
 }
 

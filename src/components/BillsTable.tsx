@@ -13,7 +13,7 @@ import { InvoicePDF } from "./InvoicePDF";
 import { useProducts } from "@/contexts/ProductContext";
 import { storage } from "@/lib/storage";
 import { toast } from "@/hooks/use-toast";
-import { Check, Eye } from "lucide-react";
+import { Check, Download } from "lucide-react";
 
 interface BillsTableProps {
   invoices: Invoice[];
@@ -88,7 +88,7 @@ export const BillsTable = ({ invoices: initialInvoices }: BillsTableProps) => {
                     onClick={() => setSelectedInvoice(invoice)}
                     className="hover:bg-primary/90 transition-colors"
                   >
-                    <Eye className="w-4 h-4" />
+                    <Download className="w-4 h-4" />
                   </Button>
                   {invoice.status === "pending" && (
                     <Button

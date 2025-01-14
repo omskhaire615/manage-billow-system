@@ -1,42 +1,32 @@
 import React from "react";
 import { Product } from "@/lib/types";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface ProductSelectionProps {
-  products: Product[];
-  onProductSelect: (productId: string) => void;
+  filteredProducts: Product[];
+  addProductToInvoice: (productId: string, quantity: number) => void;
 }
 
-export const ProductSelection = ({ products, onProductSelect }: ProductSelectionProps) => {
+export const ProductSelection = ({
+  filteredProducts,
+  addProductToInvoice,
+}: ProductSelectionProps) => {
   return (
-    <div className="space-y-2">
-      <label className="text-sm font-medium">Select Product</label>
-      <Select onValueChange={onProductSelect}>
-        <SelectTrigger className="w-full transition-all duration-200 hover:border-sage-500">
-          <SelectValue placeholder="Choose a product" />
-        </SelectTrigger>
-        <SelectContent>
-          {products.map((product) => (
-            <SelectItem 
-              key={product.id} 
-              value={product.id}
-              className="flex items-center space-x-3 p-2 cursor-pointer transition-colors duration-200 hover:bg-sage-50"
-            >
-              <div className="flex items-center space-x-3">
-                <img 
-                  src={product.imageUrl || "https://images.unsplash.com/photo-1649972904349-6e44c42644a7"} 
-                  alt={product.name}
-                  className="w-10 h-10 object-cover rounded-md"
-                />
-                <div>
-                  <p className="font-medium">{product.name}</p>
-                  <p className="text-sm text-gray-500">₹{product.price} (Stock: {product.stock})</p>
-                </div>
-              </div>
-            </SelectItem>
+    <div>
+      <h3 className="text-lg font-medium mb-2">Products</h3>
+      <div className="flex gap-4 mb-4">
+        <select
+          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+          onChange={(e) => addProductToInvoice(e.target.value, 1)}
+          value=""
+        >
+          <option value="">Select a product</option>
+          {filteredProducts.map((product) => (
+            <option key={product.id} value={product.id}>
+              {product.name} - ₹{product.price} (Stock: {product.stock})
+            </option>
           ))}
-        </SelectContent>
-      </Select>
+        </select>
+      </div>
     </div>
   );
 };

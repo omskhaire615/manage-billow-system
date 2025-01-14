@@ -14,8 +14,6 @@ export interface Product {
 export interface Invoice {
   id: string;
   customerName: string;
-  customerAddress?: string;
-  customerPhone?: string;
   items: {
     productId: string;
     quantity: number;
