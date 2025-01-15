@@ -143,7 +143,22 @@ const Dashboard = () => {
         </Card>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card className="p-6">
+          <h2 className="text-xl font-semibold mb-4">Sales Chart</h2>
+          <div className="h-[400px]">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="sales" fill="#4A5D5C" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </Card>
+
         <Card className="p-6">
           <h2 className="text-xl font-semibold mb-4">Top Selling Products</h2>
           <Table>
@@ -176,21 +191,6 @@ const Dashboard = () => {
               ))}
             </TableBody>
           </Table>
-        </Card>
-
-        <Card className="p-6">
-          <h2 className="text-xl font-semibold mb-4">Sales Chart</h2>
-          <div className="h-[400px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="sales" fill="#4f46e5" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
         </Card>
       </div>
     </div>
