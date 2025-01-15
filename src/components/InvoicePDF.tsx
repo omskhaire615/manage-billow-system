@@ -109,7 +109,7 @@ export const InvoicePDF = ({ invoice, products }: InvoicePDFProps) => {
         <Page size="A4" style={styles.page}>
           <View style={styles.header}>
             <Image
-              src="/lovable-uploads/5083834e-2791-4089-8654-07925c723b5c.png"
+              src="/lovable-uploads/da95c4e6-32bf-46cd-9aaf-a0ae0676bfcf.png"
               style={styles.logo}
             />
             <Text style={styles.title}>OM TRADERS</Text>
