@@ -96,8 +96,17 @@ const Dashboard = () => {
             className="h-40 w-40 animate-scale-in hover:scale-110 transition-transform duration-500"
           />
           <div className="text-center space-y-4">
-            <h1 className="text-5xl font-bold text-sage-800 animate-fade-in hover:text-sage-600 transition-colors duration-300">
-              Om Traders
+            <h1 className="text-5xl font-bold text-sage-800 animate-text-slide">
+              <span className="inline-block animate-char">O</span>
+              <span className="inline-block animate-char">m</span>
+              <span className="inline-block animate-char">&nbsp;</span>
+              <span className="inline-block animate-char">T</span>
+              <span className="inline-block animate-char">r</span>
+              <span className="inline-block animate-char">a</span>
+              <span className="inline-block animate-char">d</span>
+              <span className="inline-block animate-char">e</span>
+              <span className="inline-block animate-char">r</span>
+              <span className="inline-block animate-char">s</span>
             </h1>
             <p className="text-xl text-sage-600 animate-fade-in delay-150 hover:text-sage-500 transition-colors duration-300">
               PVC, Hardware & Electronics

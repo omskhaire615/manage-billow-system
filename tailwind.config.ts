@@ -87,12 +87,22 @@ export default {
           "0%": { opacity: "0" },
           "100%": { opacity: "1" },
         },
+        textSlide: {
+          "0%": { transform: "translateY(100%)", opacity: "0" },
+          "100%": { transform: "translateY(0)", opacity: "1" }
+        },
+        charFloat: {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-5px)" }
+        }
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         slideIn: "slideIn 0.3s ease-out",
         fadeIn: "fadeIn 0.3s ease-out",
+        "text-slide": "textSlide 0.5s ease-out forwards",
+        "char": "charFloat 2s ease-in-out infinite"
       },
     },
   },
