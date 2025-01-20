@@ -157,7 +157,7 @@ export const InvoicePDF = ({ invoice, products }: InvoicePDFProps) => {
         <Page size="A4" style={styles.page}>
           <View style={styles.header}>
             <View style={styles.logoContainer}>
-              <Image src="/lovable-uploads/09ac6664-cf8b-4be7-992a-f6c70a144cbc.png" />
+              <Image src="/lovable-uploads/2e0ae2ca-ad0a-46a5-9b53-156a55fc1de4.png" />
             </View>
             <View style={styles.headerRight}>
               <Text style={styles.invoiceTitle}>INVOICE</Text>
@@ -168,7 +168,7 @@ export const InvoicePDF = ({ invoice, products }: InvoicePDFProps) => {
 
           <View>
             <Text style={styles.title}>Om Traders</Text>
-            <Text style={styles.address}>Hardware, Electronics and general store</Text>
+            <Text style={styles.address}>PVC, Hardware & Electronics</Text>
             <Text style={styles.address}>Nandurdi, Devpur-Panchkeshwer Road</Text>
             <Text style={styles.address}>Niphad, Nashik</Text>
             <Text style={styles.address}>Pin Code - 422308</Text>

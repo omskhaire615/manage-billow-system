@@ -91,7 +91,7 @@ const Dashboard = () => {
         <h1 className="text-3xl font-semibold text-gray-900">Dashboard</h1>
         <div className="flex items-center space-x-4">
           <img 
-            src="/lovable-uploads/da95c4e6-32bf-46cd-9aaf-a0ae0676bfcf.png" 
+            src="/lovable-uploads/2e0ae2ca-ad0a-46a5-9b53-156a55fc1de4.png" 
             alt="Om Traders Logo" 
             className="h-16 w-16"
           />
