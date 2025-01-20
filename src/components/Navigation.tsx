@@ -19,12 +19,12 @@ const Navigation = () => {
 
   const navContent = (
     <>
-      <div className="flex items-center space-x-2 p-4">
+      <div className="flex items-center space-x-2">
         <Package className="w-6 h-6 text-sage-500" />
-        <span className="text-xl font-semibold text-sage-500">Om Traders</span>
+        <span className="text-xl font-semibold text-sage-500">ProductOS</span>
       </div>
       
-      <div className="space-y-2 p-4">
+      <div className="space-y-2">
         {links.map(({ to, label, icon: Icon }) => (
           <Link
             key={to}
@@ -56,7 +56,7 @@ const Navigation = () => {
         </button>
         <nav
           className={cn(
-            "fixed top-0 left-0 h-screen w-64 bg-white border-r border-gray-200 transform transition-transform duration-300 ease-in-out z-40",
+            "fixed top-0 left-0 h-screen w-64 bg-white border-r border-gray-200 p-6 space-y-8 transform transition-transform duration-300 ease-in-out z-40",
             isOpen ? "translate-x-0" : "-translate-x-full"
           )}
         >
@@ -67,7 +67,7 @@ const Navigation = () => {
   }
 
   return (
-    <nav className="fixed top-0 left-0 h-screen w-64 bg-white border-r border-gray-200">
+    <nav className="fixed top-0 left-0 h-screen w-64 bg-white border-r border-gray-200 p-6 space-y-8">
       {navContent}
     </nav>
   );
