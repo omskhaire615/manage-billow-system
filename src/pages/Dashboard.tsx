@@ -84,63 +84,65 @@ const Dashboard = () => {
   }, []);
 
   return (
-    <div className="space-y-8 animate-fadeIn">
+    <div className="space-y-8">
       <LowStockAlert />
       
-      <div className="relative w-full h-64 bg-gradient-to-r from-sage-50 to-sage-100 rounded-lg overflow-hidden mb-8">
-        <div className="absolute inset-0 bg-[url('/lovable-uploads/photo-1500673922987-e212871fec22')] bg-cover bg-center opacity-10"></div>
-        <div className="relative flex flex-col items-center justify-center h-full space-y-4">
+      <div className="relative w-full h-80 bg-gradient-to-r from-sage-50 to-sage-100 rounded-lg overflow-hidden mb-8 group">
+        <div className="absolute inset-0 bg-[url('/lovable-uploads/photo-1500673922987-e212871fec22')] bg-cover bg-center opacity-10 group-hover:opacity-20 transition-opacity duration-500"></div>
+        <div className="relative flex flex-col items-center justify-center h-full space-y-6">
           <img 
             src="/lovable-uploads/2e0ae2ca-ad0a-46a5-9b53-156a55fc1de4.png" 
             alt="Om Traders Logo" 
-            className="h-32 w-32 animate-scale-in"
+            className="h-40 w-40 animate-scale-in hover:scale-110 transition-transform duration-500"
           />
-          <h1 className="text-4xl font-bold text-sage-800 animate-fade-in">
-            Om Traders
-          </h1>
-          <p className="text-sage-600 animate-fade-in delay-150">
-            PVC, Hardware & Electronics
-          </p>
+          <div className="text-center space-y-4">
+            <h1 className="text-5xl font-bold text-sage-800 animate-fade-in hover:text-sage-600 transition-colors duration-300">
+              Om Traders
+            </h1>
+            <p className="text-xl text-sage-600 animate-fade-in delay-150 hover:text-sage-500 transition-colors duration-300">
+              PVC, Hardware & Electronics
+            </p>
+          </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="p-6 hover:shadow-lg transition-shadow">
+        <Card className="p-6 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
           <div className="flex items-center space-x-4">
-            <div className="p-3 bg-sage-50 rounded-lg">
+            <div className="p-3 bg-sage-50 rounded-lg animate-pulse">
               <Package className="w-6 h-6 text-sage-500" />
             </div>
             <div>
               <p className="text-sm text-gray-500">Total Products</p>
-              <p className="text-2xl font-semibold text-gray-900">
+              <p className="text-2xl font-semibold text-gray-900 animate-fade-in">
                 {stats.totalProducts}
               </p>
             </div>
           </div>
         </Card>
 
-        <Card className="p-6 hover:shadow-lg transition-shadow">
+        <Card className="p-6 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
           <div className="flex items-center space-x-4">
-            <div className="p-3 bg-sage-50 rounded-lg">
+            <div className="p-3 bg-sage-50 rounded-lg animate-pulse">
               <Receipt className="w-6 h-6 text-sage-500" />
             </div>
             <div>
               <p className="text-sm text-gray-500">Total Invoices</p>
-              <p className="text-2xl font-semibold text-gray-900">
+              <p className="text-2xl font-semibold text-gray-900 animate-fade-in">
                 {stats.totalInvoices}
               </p>
             </div>
           </div>
         </Card>
 
-        <Card className="p-6 hover:shadow-lg transition-shadow">
+        <Card className="p-6 hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
           <div className="flex items-center space-x-4">
-            <div className="p-3 bg-sage-50 rounded-lg">
+            <div className="p-3 bg-sage-50 rounded-lg animate-pulse">
               <TrendingUp className="w-6 h-6 text-sage-500" />
             </div>
             <div>
               <p className="text-sm text-gray-500">Total Revenue</p>
-              <p className="text-2xl font-semibold text-gray-900">
+              <p className="text-2xl font-semibold text-gray-900 animate-fade-in">
                 ₹{stats.totalRevenue.toFixed(2)}
               </p>
             </div>

@@ -31,7 +31,6 @@ export const BillingTable = ({
       <TableHeader>
         <TableRow>
           <TableHead>Product</TableHead>
-          <TableHead>Image</TableHead>
           <TableHead>Dimensions</TableHead>
           <TableHead>Quantity</TableHead>
           <TableHead>Price</TableHead>
@@ -43,13 +42,6 @@ export const BillingTable = ({
         {selectedProducts.map(({ product, quantity }, index) => (
           <TableRow key={index}>
             <TableCell>{product.name}</TableCell>
-            <TableCell>
-              <img
-                src={product.imageUrl || "/placeholder.svg"}
-                alt={product.name}
-                className="w-12 h-12 object-cover rounded"
-              />
-            </TableCell>
             <TableCell>{product.dimensions}</TableCell>
             <TableCell>
               <Input
