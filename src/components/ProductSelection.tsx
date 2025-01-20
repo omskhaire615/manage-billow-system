@@ -22,10 +22,27 @@ export const ProductSelection = ({
           <option value="">Select a product</option>
           {filteredProducts.map((product) => (
             <option key={product.id} value={product.id}>
-              {product.name} - ₹{product.price} (Stock: {product.stock})
+              {product.name} - {product.dimensions} - ₹{product.price} (Stock: {product.stock})
             </option>
           ))}
         </select>
+      </div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        {filteredProducts.map((product) => (
+          <div 
+            key={product.id}
+            className="p-2 border rounded-lg hover:shadow-md transition-shadow cursor-pointer"
+            onClick={() => addProductToInvoice(product.id, 1)}
+          >
+            <img 
+              src={product.imageUrl || "/placeholder.svg"}
+              alt={product.name}
+              className="w-full h-24 object-cover rounded-md mb-2"
+            />
+            <p className="text-sm font-medium truncate">{product.name}</p>
+            <p className="text-xs text-gray-500">{product.dimensions}</p>
+          </div>
+        ))}
       </div>
     </div>
   );

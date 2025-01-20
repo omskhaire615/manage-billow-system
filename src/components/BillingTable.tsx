@@ -32,6 +32,7 @@ export const BillingTable = ({
         <TableRow>
           <TableHead>Product</TableHead>
           <TableHead>Image</TableHead>
+          <TableHead>Dimensions</TableHead>
           <TableHead>Quantity</TableHead>
           <TableHead>Price</TableHead>
           <TableHead>Total</TableHead>
@@ -49,6 +50,7 @@ export const BillingTable = ({
                 className="w-12 h-12 object-cover rounded"
               />
             </TableCell>
+            <TableCell>{product.dimensions}</TableCell>
             <TableCell>
               <Input
                 type="number"

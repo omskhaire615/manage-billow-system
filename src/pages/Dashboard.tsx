@@ -87,18 +87,23 @@ const Dashboard = () => {
     <div className="space-y-8 animate-fadeIn">
       <LowStockAlert />
       
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-semibold text-gray-900">Dashboard</h1>
-        <div className="flex items-center space-x-4">
+      <div className="relative w-full h-64 bg-gradient-to-r from-sage-50 to-sage-100 rounded-lg overflow-hidden mb-8">
+        <div className="absolute inset-0 bg-[url('/lovable-uploads/photo-1500673922987-e212871fec22')] bg-cover bg-center opacity-10"></div>
+        <div className="relative flex flex-col items-center justify-center h-full space-y-4">
           <img 
             src="/lovable-uploads/2e0ae2ca-ad0a-46a5-9b53-156a55fc1de4.png" 
             alt="Om Traders Logo" 
-            className="h-16 w-16"
+            className="h-32 w-32 animate-scale-in"
           />
-          <h2 className="text-2xl font-bold text-gray-800">Om Traders</h2>
+          <h1 className="text-4xl font-bold text-sage-800 animate-fade-in">
+            Om Traders
+          </h1>
+          <p className="text-sage-600 animate-fade-in delay-150">
+            PVC, Hardware & Electronics
+          </p>
         </div>
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="p-6 hover:shadow-lg transition-shadow">
           <div className="flex items-center space-x-4">
