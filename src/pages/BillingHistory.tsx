@@ -9,9 +9,11 @@ const BillingHistory = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const allInvoices = storage.getInvoices();
   
-  const filteredInvoices = allInvoices.filter((invoice) =>
-    invoice.customerName.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredInvoices = allInvoices
+    .filter((invoice) =>
+      invoice.customerName.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   return (
     <div className="space-y-6">

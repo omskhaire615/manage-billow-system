@@ -1,6 +1,6 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
-import { Home, Package, Receipt, History } from "lucide-react";
+import { Home, Package, Receipt, History, Calculator } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Button } from "./ui/button";
@@ -55,6 +55,7 @@ const Navigation = () => {
             <NavItem to="/products" icon={Package}>Products</NavItem>
             <NavItem to="/billing" icon={Receipt}>Billing</NavItem>
             <NavItem to="/billing-history" icon={History}>Billing History</NavItem>
+            <NavItem to="/calculator" icon={Calculator}>Calculator</NavItem>
           </div>
         </div>
       </nav>
