@@ -1,97 +1,173 @@
 import React, { useState } from "react";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
-import { Calculator as CalcIcon } from "lucide-react";
 
 const Calculator = () => {
-  const [num1, setNum1] = useState<string>("");
-  const [num2, setNum2] = useState<string>("");
-  const [operation, setOperation] = useState<string>("+");
-  const [result, setResult] = useState<number | null>(null);
+  const [display, setDisplay] = useState<string>("0");
+  const [equation, setEquation] = useState<string>("");
 
-  const calculate = () => {
-    const n1 = parseFloat(num1);
-    const n2 = parseFloat(num2);
+  const handleNumber = (num: string) => {
+    setDisplay(prev => prev === "0" ? num : prev + num);
+  };
 
-    if (isNaN(n1) || isNaN(n2)) {
-      setResult(null);
-      return;
+  const handleOperator = (op: string) => {
+    setEquation(display + " " + op + " ");
+    setDisplay("0");
+  };
+
+  const handleEquals = () => {
+    try {
+      const result = eval(equation + display);
+      setDisplay(String(result));
+      setEquation("");
+    } catch (error) {
+      setDisplay("Error");
+      setEquation("");
     }
+  };
 
-    switch (operation) {
-      case "+":
-        setResult(n1 + n2);
-        break;
-      case "-":
-        setResult(n1 - n2);
-        break;
-      case "*":
-        setResult(n1 * n2);
-        break;
-      case "/":
-        setResult(n2 !== 0 ? n1 / n2 : null);
-        break;
+  const handleClear = () => {
+    setDisplay("0");
+    setEquation("");
+  };
+
+  const handleDecimal = () => {
+    if (!display.includes(".")) {
+      setDisplay(prev => prev + ".");
     }
   };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-2">
-        <CalcIcon className="w-8 h-8 text-sage-600" />
         <h1 className="text-3xl font-semibold text-gray-900">Calculator</h1>
       </div>
 
-      <Card className="p-6 max-w-md mx-auto">
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">First Number</label>
-            <Input
-              type="number"
-              value={num1}
-              onChange={(e) => setNum1(e.target.value)}
-              placeholder="Enter first number"
+      <Card className="max-w-sm mx-auto bg-white rounded-3xl shadow-lg p-6">
+        <div className="space-y-6">
+          {/* Display */}
+          <div className="text-right space-y-1">
+            <div className="text-gray-500 text-sm h-5">{equation}</div>
+            <Input 
+              value={display}
+              readOnly
+              className="text-4xl text-right border-none focus-visible:ring-0 font-light"
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium mb-1">Operation</label>
-            <select
-              className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-              value={operation}
-              onChange={(e) => setOperation(e.target.value)}
+          {/* Keypad */}
+          <div className="grid grid-cols-4 gap-3">
+            {/* Row 1 */}
+            <Button
+              variant="outline"
+              onClick={handleClear}
+              className="bg-gray-50 hover:bg-gray-100 text-lg font-normal"
             >
-              <option value="+">Addition (+)</option>
-              <option value="-">Subtraction (-)</option>
-              <option value="*">Multiplication (×)</option>
-              <option value="/">Division (÷)</option>
-            </select>
+              AC
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => handleOperator("+/-")}
+              className="bg-gray-50 hover:bg-gray-100 text-lg font-normal"
+            >
+              +/-
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => handleOperator("%")}
+              className="bg-gray-50 hover:bg-gray-100 text-lg font-normal"
+            >
+              %
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => handleOperator("/")}
+              className="bg-rose-50 hover:bg-rose-100 text-rose-500 text-lg font-normal"
+            >
+              ÷
+            </Button>
+
+            {/* Row 2 */}
+            {[7, 8, 9].map((num) => (
+              <Button
+                key={num}
+                variant="outline"
+                onClick={() => handleNumber(String(num))}
+                className="bg-gray-50 hover:bg-gray-100 text-lg font-normal"
+              >
+                {num}
+              </Button>
+            ))}
+            <Button
+              variant="outline"
+              onClick={() => handleOperator("*")}
+              className="bg-rose-50 hover:bg-rose-100 text-rose-500 text-lg font-normal"
+            >
+              ×
+            </Button>
+
+            {/* Row 3 */}
+            {[4, 5, 6].map((num) => (
+              <Button
+                key={num}
+                variant="outline"
+                onClick={() => handleNumber(String(num))}
+                className="bg-gray-50 hover:bg-gray-100 text-lg font-normal"
+              >
+                {num}
+              </Button>
+            ))}
+            <Button
+              variant="outline"
+              onClick={() => handleOperator("-")}
+              className="bg-rose-50 hover:bg-rose-100 text-rose-500 text-lg font-normal"
+            >
+              −
+            </Button>
+
+            {/* Row 4 */}
+            {[1, 2, 3].map((num) => (
+              <Button
+                key={num}
+                variant="outline"
+                onClick={() => handleNumber(String(num))}
+                className="bg-gray-50 hover:bg-gray-100 text-lg font-normal"
+              >
+                {num}
+              </Button>
+            ))}
+            <Button
+              variant="outline"
+              onClick={() => handleOperator("+")}
+              className="bg-rose-50 hover:bg-rose-100 text-rose-500 text-lg font-normal"
+            >
+              +
+            </Button>
+
+            {/* Row 5 */}
+            <Button
+              variant="outline"
+              onClick={() => handleNumber("0")}
+              className="bg-gray-50 hover:bg-gray-100 text-lg font-normal col-span-1"
+            >
+              0
+            </Button>
+            <Button
+              variant="outline"
+              onClick={handleDecimal}
+              className="bg-gray-50 hover:bg-gray-100 text-lg font-normal"
+            >
+              .
+            </Button>
+            <Button
+              variant="outline"
+              onClick={handleEquals}
+              className="bg-rose-50 hover:bg-rose-100 text-rose-500 text-lg font-normal col-span-2"
+            >
+              =
+            </Button>
           </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">Second Number</label>
-            <Input
-              type="number"
-              value={num2}
-              onChange={(e) => setNum2(e.target.value)}
-              placeholder="Enter second number"
-            />
-          </div>
-
-          <Button 
-            onClick={calculate}
-            className="w-full bg-sage-500 hover:bg-sage-600"
-          >
-            Calculate
-          </Button>
-
-          {result !== null && (
-            <div className="mt-4 p-4 bg-gray-50 rounded-md">
-              <p className="text-center text-lg font-medium">
-                Result: {result}
-              </p>
-            </div>
-          )}
         </div>
       </Card>
     </div>
