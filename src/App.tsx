@@ -7,6 +7,7 @@ import Navigation from "@/components/Navigation";
 import Dashboard from "@/pages/Dashboard";
 import Products from "@/pages/Products";
 import Billing from "@/pages/Billing";
+import BillingHistory from "@/pages/BillingHistory";
 import React from 'react';
 import { ProductProvider } from "@/contexts/ProductContext";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -36,6 +37,7 @@ function App() {
                     <Route path="/" element={<Dashboard />} />
                     <Route path="/products" element={<Products />} />
                     <Route path="/billing" element={<Billing />} />
+                    <Route path="/billing-history" element={<BillingHistory />} />
                   </Routes>
                 </main>
               </div>

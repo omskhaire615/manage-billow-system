@@ -1,75 +1,64 @@
-import { Link, useLocation } from "react-router-dom";
+import React from "react";
+import { NavLink } from "react-router-dom";
+import { Home, Package, Receipt, History } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { Package, Receipt, LayoutGrid, Menu, X } from "lucide-react";
-import { useState } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Button } from "./ui/button";
 
 const Navigation = () => {
-  const location = useLocation();
   const isMobile = useIsMobile();
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = React.useState(!isMobile);
 
-  const links = [
-    { to: "/", label: "Dashboard", icon: LayoutGrid },
-    { to: "/products", label: "Products", icon: Package },
-    { to: "/billing", label: "Billing", icon: Receipt },
-  ];
+  const toggleNav = () => setIsOpen(!isOpen);
 
-  const toggleMenu = () => setIsOpen(!isOpen);
-
-  const navContent = (
-    <>
-      <div className="flex items-center space-x-2">
-        <Package className="w-6 h-6 text-sage-500" />
-        <span className="text-xl font-semibold text-sage-500">ProductOS</span>
-      </div>
-      
-      <div className="space-y-2">
-        {links.map(({ to, label, icon: Icon }) => (
-          <Link
-            key={to}
-            to={to}
-            onClick={() => isMobile && setIsOpen(false)}
-            className={cn(
-              "flex items-center space-x-3 px-4 py-3 rounded-lg transition-all duration-200",
-              location.pathname === to
-                ? "bg-sage-50 text-sage-500"
-                : "text-gray-600 hover:bg-gray-50"
-            )}
-          >
-            <Icon className="w-5 h-5" />
-            <span>{label}</span>
-          </Link>
-        ))}
-      </div>
-    </>
+  const NavItem = ({ to, icon: Icon, children }: { to: string; icon: any; children: React.ReactNode }) => (
+    <NavLink
+      to={to}
+      className={({ isActive }) =>
+        cn(
+          "flex items-center space-x-3 rounded-lg px-3 py-2 text-gray-600 transition-all hover:text-gray-900",
+          isActive ? "bg-gray-100 text-gray-900" : "hover:bg-gray-50"
+        )
+      }
+    >
+      <Icon className="h-5 w-5" />
+      <span>{children}</span>
+    </NavLink>
   );
 
-  if (isMobile) {
-    return (
-      <>
-        <button
-          onClick={toggleMenu}
-          className="fixed top-4 left-4 z-50 p-2 bg-white rounded-lg shadow-md"
-        >
-          {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-        </button>
-        <nav
-          className={cn(
-            "fixed top-0 left-0 h-screen w-64 bg-white border-r border-gray-200 p-6 space-y-8 transform transition-transform duration-300 ease-in-out z-40",
-            isOpen ? "translate-x-0" : "-translate-x-full"
-          )}
-        >
-          {navContent}
-        </nav>
-      </>
-    );
-  }
-
   return (
-    <nav className="fixed top-0 left-0 h-screen w-64 bg-white border-r border-gray-200 p-6 space-y-8">
-      {navContent}
-    </nav>
+    <>
+      {isMobile && (
+        <Button
+          variant="outline"
+          size="icon"
+          className="fixed top-4 left-4 z-50"
+          onClick={toggleNav}
+        >
+          <Package className="h-4 w-4" />
+        </Button>
+      )}
+      <nav
+        className={cn(
+          "fixed top-0 left-0 h-full w-64 bg-white p-4 shadow-lg transition-transform duration-200 ease-in-out z-40",
+          isMobile && !isOpen && "-translate-x-full"
+        )}
+      >
+        <div className="space-y-4">
+          <div className="py-2">
+            <h2 className="mb-2 px-2 text-lg font-semibold tracking-tight">
+              Om Traders
+            </h2>
+          </div>
+          <div className="space-y-1">
+            <NavItem to="/" icon={Home}>Dashboard</NavItem>
+            <NavItem to="/products" icon={Package}>Products</NavItem>
+            <NavItem to="/billing" icon={Receipt}>Billing</NavItem>
+            <NavItem to="/billing-history" icon={History}>Billing History</NavItem>
+          </div>
+        </div>
+      </nav>
+    </>
   );
 };
 
