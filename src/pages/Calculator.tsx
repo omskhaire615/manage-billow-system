@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,6 +38,37 @@ const Calculator = () => {
     }
   };
 
+  // Keyboard event handler
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      const key = event.key;
+      
+      // Numbers
+      if (/[0-9]/.test(key)) {
+        handleNumber(key);
+      }
+      // Operators
+      else if (['+', '-', '*', '/'].includes(key)) {
+        handleOperator(key);
+      }
+      // Equals
+      else if (key === 'Enter' || key === '=') {
+        handleEquals();
+      }
+      // Clear
+      else if (key === 'Escape' || key === 'c') {
+        handleClear();
+      }
+      // Decimal
+      else if (key === '.') {
+        handleDecimal();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, [display, equation]);
+
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-2">
@@ -52,7 +83,7 @@ const Calculator = () => {
             <Input 
               value={display}
               readOnly
-              className="text-4xl text-right border-none focus-visible:ring-0 font-light"
+              className="text-5xl text-right border-none focus-visible:ring-0 font-light h-16"
             />
           </div>
 
@@ -62,28 +93,28 @@ const Calculator = () => {
             <Button
               variant="outline"
               onClick={handleClear}
-              className="bg-gray-50 hover:bg-gray-100 text-lg font-normal"
+              className="bg-gray-50 hover:bg-gray-100 text-xl font-normal"
             >
               AC
             </Button>
             <Button
               variant="outline"
               onClick={() => handleOperator("+/-")}
-              className="bg-gray-50 hover:bg-gray-100 text-lg font-normal"
+              className="bg-gray-50 hover:bg-gray-100 text-xl font-normal"
             >
               +/-
             </Button>
             <Button
               variant="outline"
               onClick={() => handleOperator("%")}
-              className="bg-gray-50 hover:bg-gray-100 text-lg font-normal"
+              className="bg-gray-50 hover:bg-gray-100 text-xl font-normal"
             >
               %
             </Button>
             <Button
               variant="outline"
               onClick={() => handleOperator("/")}
-              className="bg-rose-50 hover:bg-rose-100 text-rose-500 text-lg font-normal"
+              className="bg-rose-50 hover:bg-rose-100 text-rose-500 text-xl font-normal"
             >
               ÷
             </Button>
@@ -94,7 +125,7 @@ const Calculator = () => {
                 key={num}
                 variant="outline"
                 onClick={() => handleNumber(String(num))}
-                className="bg-gray-50 hover:bg-gray-100 text-lg font-normal"
+                className="bg-gray-50 hover:bg-gray-100 text-xl font-normal"
               >
                 {num}
               </Button>
@@ -102,7 +133,7 @@ const Calculator = () => {
             <Button
               variant="outline"
               onClick={() => handleOperator("*")}
-              className="bg-rose-50 hover:bg-rose-100 text-rose-500 text-lg font-normal"
+              className="bg-rose-50 hover:bg-rose-100 text-rose-500 text-xl font-normal"
             >
               ×
             </Button>
@@ -113,7 +144,7 @@ const Calculator = () => {
                 key={num}
                 variant="outline"
                 onClick={() => handleNumber(String(num))}
-                className="bg-gray-50 hover:bg-gray-100 text-lg font-normal"
+                className="bg-gray-50 hover:bg-gray-100 text-xl font-normal"
               >
                 {num}
               </Button>
@@ -121,7 +152,7 @@ const Calculator = () => {
             <Button
               variant="outline"
               onClick={() => handleOperator("-")}
-              className="bg-rose-50 hover:bg-rose-100 text-rose-500 text-lg font-normal"
+              className="bg-rose-50 hover:bg-rose-100 text-rose-500 text-xl font-normal"
             >
               −
             </Button>
@@ -132,7 +163,7 @@ const Calculator = () => {
                 key={num}
                 variant="outline"
                 onClick={() => handleNumber(String(num))}
-                className="bg-gray-50 hover:bg-gray-100 text-lg font-normal"
+                className="bg-gray-50 hover:bg-gray-100 text-xl font-normal"
               >
                 {num}
               </Button>
@@ -140,7 +171,7 @@ const Calculator = () => {
             <Button
               variant="outline"
               onClick={() => handleOperator("+")}
-              className="bg-rose-50 hover:bg-rose-100 text-rose-500 text-lg font-normal"
+              className="bg-rose-50 hover:bg-rose-100 text-rose-500 text-xl font-normal"
             >
               +
             </Button>
@@ -149,21 +180,21 @@ const Calculator = () => {
             <Button
               variant="outline"
               onClick={() => handleNumber("0")}
-              className="bg-gray-50 hover:bg-gray-100 text-lg font-normal col-span-1"
+              className="bg-gray-50 hover:bg-gray-100 text-xl font-normal col-span-1"
             >
               0
             </Button>
             <Button
               variant="outline"
               onClick={handleDecimal}
-              className="bg-gray-50 hover:bg-gray-100 text-lg font-normal"
+              className="bg-gray-50 hover:bg-gray-100 text-xl font-normal"
             >
               .
             </Button>
             <Button
               variant="outline"
               onClick={handleEquals}
-              className="bg-rose-50 hover:bg-rose-100 text-rose-500 text-lg font-normal col-span-2"
+              className="bg-rose-50 hover:bg-rose-100 text-rose-500 text-xl font-normal col-span-2"
             >
               =
             </Button>
