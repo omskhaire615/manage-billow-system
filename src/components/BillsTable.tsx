@@ -17,12 +17,13 @@ import { Check, Eye } from "lucide-react";
 
 interface BillsTableProps {
   invoices: Invoice[];
+  isHistoryView?: boolean;
 }
 
-export const BillsTable = ({ invoices: initialInvoices }: BillsTableProps) => {
+export const BillsTable = ({ invoices: initialInvoices, isHistoryView = false }: BillsTableProps) => {
   const [selectedInvoice, setSelectedInvoice] = useState<Invoice | null>(null);
   const [invoices, setInvoices] = useState<Invoice[]>(
-    initialInvoices.filter((inv) => inv.status !== "paid")
+    isHistoryView ? initialInvoices : initialInvoices.filter((inv) => inv.status !== "paid")
   );
   const { products } = useProducts();
 
@@ -88,7 +89,7 @@ export const BillsTable = ({ invoices: initialInvoices }: BillsTableProps) => {
                   >
                     <Eye className="w-4 h-4" />
                   </Button>
-                  {invoice.status === "pending" && (
+                  {!isHistoryView && invoice.status === "pending" && (
                     <Button
                       variant="outline"
                       size="sm"

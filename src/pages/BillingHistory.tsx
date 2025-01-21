@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { storage } from "@/lib/storage";
-import { Invoice } from "@/lib/types";
 import { BillsTable } from "@/components/BillsTable";
 import { Search } from "lucide-react";
 
@@ -31,7 +30,7 @@ const BillingHistory = () => {
       </div>
 
       <Card className="p-6">
-        <BillsTable invoices={filteredInvoices} />
+        <BillsTable invoices={filteredInvoices} isHistoryView={true} />
       </Card>
     </div>
   );
