@@ -13,6 +13,7 @@ interface OrderItem {
   quantity: number;
   name: string;
   price: number;
+  dimensions: string;
 }
 
 const OrderMaker = () => {
@@ -32,6 +33,7 @@ const OrderMaker = () => {
       quantity,
       name: product.name,
       price: product.price,
+      dimensions: product.dimensions,
     };
 
     setOrderItems([...orderItems, newItem]);
@@ -65,7 +67,7 @@ const OrderMaker = () => {
               <SelectContent>
                 {products.map((product) => (
                   <SelectItem key={product.id} value={product.id}>
-                    {product.name} - ₹{product.price}
+                    {product.name} - {product.dimensions}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -102,8 +104,7 @@ const OrderMaker = () => {
               <TableRow>
                 <TableHead>Product</TableHead>
                 <TableHead>Quantity</TableHead>
-                <TableHead>Price</TableHead>
-                <TableHead>Total</TableHead>
+                <TableHead>Dimensions</TableHead>
                 <TableHead>Action</TableHead>
               </TableRow>
             </TableHeader>
@@ -112,8 +113,7 @@ const OrderMaker = () => {
                 <TableRow key={index}>
                   <TableCell>{item.name}</TableCell>
                   <TableCell>{item.quantity}</TableCell>
-                  <TableCell>₹{item.price.toFixed(2)}</TableCell>
-                  <TableCell>₹{(item.quantity * item.price).toFixed(2)}</TableCell>
+                  <TableCell>{item.dimensions}</TableCell>
                   <TableCell>
                     <Button
                       variant="destructive"
@@ -125,13 +125,6 @@ const OrderMaker = () => {
                   </TableCell>
                 </TableRow>
               ))}
-              <TableRow>
-                <TableCell colSpan={3} className="text-right font-semibold">
-                  Total:
-                </TableCell>
-                <TableCell className="font-semibold">₹{total.toFixed(2)}</TableCell>
-                <TableCell />
-              </TableRow>
             </TableBody>
           </Table>
         </Card>

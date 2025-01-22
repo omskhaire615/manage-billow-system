@@ -27,13 +27,13 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: "#666666",
   },
-  table: {
-    display: "table",
+  tableContainer: {
+    flexDirection: 'column',
     width: "100%",
     marginBottom: 20,
   },
   tableRow: {
-    flexDirection: "row",
+    flexDirection: 'row',
     borderBottomWidth: 1,
     borderBottomColor: "#000000",
     borderBottomStyle: "solid",
@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#f3f4f6",
   },
   tableCol: {
-    width: "25%",
+    width: "33%",
   },
   tableCell: {
     fontSize: 12,
@@ -66,6 +66,7 @@ interface OrderPDFProps {
   orderItems: Array<{
     name: string;
     quantity: number;
+    dimensions: string;
     price: number;
   }>;
   total: number;
@@ -83,7 +84,7 @@ export const OrderPDF = ({ orderItems, total }: OrderPDFProps) => {
             </Text>
           </View>
 
-          <View style={styles.table}>
+          <View style={styles.tableContainer}>
             <View style={[styles.tableRow, styles.tableHeader]}>
               <View style={styles.tableCol}>
                 <Text style={styles.tableCell}>Product</Text>
@@ -92,10 +93,7 @@ export const OrderPDF = ({ orderItems, total }: OrderPDFProps) => {
                 <Text style={styles.tableCell}>Quantity</Text>
               </View>
               <View style={styles.tableCol}>
-                <Text style={styles.tableCell}>Price</Text>
-              </View>
-              <View style={styles.tableCol}>
-                <Text style={styles.tableCell}>Total</Text>
+                <Text style={styles.tableCell}>Dimensions</Text>
               </View>
             </View>
 
@@ -108,12 +106,7 @@ export const OrderPDF = ({ orderItems, total }: OrderPDFProps) => {
                   <Text style={styles.tableCell}>{item.quantity}</Text>
                 </View>
                 <View style={styles.tableCol}>
-                  <Text style={styles.tableCell}>₹{item.price.toFixed(2)}</Text>
-                </View>
-                <View style={styles.tableCol}>
-                  <Text style={styles.tableCell}>
-                    ₹{(item.quantity * item.price).toFixed(2)}
-                  </Text>
+                  <Text style={styles.tableCell}>{item.dimensions}</Text>
                 </View>
               </View>
             ))}
