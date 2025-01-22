@@ -12,50 +12,28 @@ export const ProductSelection: React.FC<ProductSelectionProps> = ({
   filteredProducts,
   addProductToInvoice,
 }) => {
-  const [selectedQuantity, setSelectedQuantity] = React.useState("1");
-
   const handleProductSelect = (productId: string) => {
-    addProductToInvoice(productId, parseInt(selectedQuantity));
+    addProductToInvoice(productId, 1); // Default quantity to 1
   };
 
   return (
     <Card className="p-6 space-y-4">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label className="block text-sm font-medium mb-2 text-gray-700">
-            Select Product
-          </label>
-          <Select onValueChange={handleProductSelect}>
-            <SelectTrigger>
-              <SelectValue placeholder="Choose a product" />
-            </SelectTrigger>
-            <SelectContent>
-              {filteredProducts.map((product) => (
-                <SelectItem key={product.id} value={product.id}>
-                  {product.name} - ₹{product.price} ({product.stock} in stock)
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        
-        <div>
-          <label className="block text-sm font-medium mb-2 text-gray-700">
-            Quantity
-          </label>
-          <Select value={selectedQuantity} onValueChange={setSelectedQuantity}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select quantity" />
-            </SelectTrigger>
-            <SelectContent>
-              {[1, 2, 3, 4, 5].map((num) => (
-                <SelectItem key={num} value={num.toString()}>
-                  {num}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+      <div>
+        <label className="block text-sm font-medium mb-2 text-gray-700">
+          Select Product
+        </label>
+        <Select onValueChange={handleProductSelect}>
+          <SelectTrigger>
+            <SelectValue placeholder="Choose a product" />
+          </SelectTrigger>
+          <SelectContent>
+            {filteredProducts.map((product) => (
+              <SelectItem key={product.id} value={product.id}>
+                {product.name} - ₹{product.price} ({product.stock} in stock)
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
     </Card>
   );
