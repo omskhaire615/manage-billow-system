@@ -9,6 +9,7 @@ import Products from "@/pages/Products";
 import Billing from "@/pages/Billing";
 import BillingHistory from "@/pages/BillingHistory";
 import Calculator from "@/pages/Calculator";
+import OrderMaker from "@/pages/OrderMaker";
 import React from 'react';
 import { ProductProvider } from "@/contexts/ProductContext";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -40,6 +41,7 @@ function App() {
                     <Route path="/billing" element={<Billing />} />
                     <Route path="/billing-history" element={<BillingHistory />} />
                     <Route path="/calculator" element={<Calculator />} />
+                    <Route path="/order-maker" element={<OrderMaker />} />
                   </Routes>
                 </main>
               </div>
