@@ -13,7 +13,6 @@ import { useProducts } from "@/contexts/ProductContext";
 import { Product } from "@/lib/types";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { LowStockAlert } from "@/components/LowStockAlert";
 import { ProductSearch } from "@/components/ProductSearch";
 
@@ -32,9 +31,9 @@ const Products = () => {
     const formData = new FormData(e.currentTarget);
     const productData = {
       name: formData.get("name") as string,
-      description: formData.get("description") as string,
+      description: "", // Set empty description
       price: parseFloat(formData.get("price") as string),
-      category: formData.get("category") as string,
+      category: "", // Set empty category
       stock: parseInt(formData.get("stock") as string),
       dimensions: formData.get("dimensions") as string,
       imageUrl: formData.get("imageUrl") as string,
@@ -82,15 +81,6 @@ const Products = () => {
                 className="w-full"
               />
             </div>
-            <div>
-              <label className="block text-sm font-medium mb-1 text-sage-700">Description</label>
-              <Textarea
-                name="description"
-                defaultValue={editingProduct?.description}
-                required
-                className="w-full"
-              />
-            </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium mb-1 text-sage-700">Image URL</label>
@@ -114,7 +104,7 @@ const Products = () => {
                 />
               </div>
             </div>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium mb-1 text-sage-700">Price (₹)</label>
                 <Input
@@ -122,15 +112,6 @@ const Products = () => {
                   type="number"
                   step="0.01"
                   defaultValue={editingProduct?.price}
-                  required
-                  className="w-full"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium mb-1 text-sage-700">Category</label>
-                <Input
-                  name="category"
-                  defaultValue={editingProduct?.category}
                   required
                   className="w-full"
                 />
@@ -175,7 +156,6 @@ const Products = () => {
             <TableRow>
               <TableHead>Image</TableHead>
               <TableHead>Name</TableHead>
-              <TableHead>Category</TableHead>
               <TableHead>Price</TableHead>
               <TableHead>Dimensions</TableHead>
               <TableHead>Stock</TableHead>
@@ -193,7 +173,6 @@ const Products = () => {
                   />
                 </TableCell>
                 <TableCell>{product.name}</TableCell>
-                <TableCell>{product.category}</TableCell>
                 <TableCell>₹{product.price.toFixed(2)}</TableCell>
                 <TableCell>{product.dimensions}</TableCell>
                 <TableCell>
