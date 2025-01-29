@@ -29,7 +29,7 @@ export const ProductSelection: React.FC<ProductSelectionProps> = ({
           <SelectContent>
             {filteredProducts.map((product) => (
               <SelectItem key={product.id} value={product.id}>
-                {product.name} - ₹{product.price} ({product.stock} in stock)
+                {product.name} - {product.dimensions}
               </SelectItem>
             ))}
           </SelectContent>
