@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { Card } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Product } from "@/lib/types";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 interface ProductSelectionProps {
   filteredProducts: Product[];
@@ -40,22 +40,19 @@ export const ProductSelection: React.FC<ProductSelectionProps> = ({
           />
         </div>
         
-        <div>
-          <label className="block text-sm font-medium mb-2 text-gray-700">
-            Select Product
-          </label>
-          <Select onValueChange={handleProductSelect}>
-            <SelectTrigger>
-              <SelectValue placeholder="Choose a product" />
-            </SelectTrigger>
-            <SelectContent>
-              {searchedProducts.map((product) => (
-                <SelectItem key={product.id} value={product.id}>
-                  {product.name} - {product.dimensions}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {searchedProducts.map((product) => (
+            <Button
+              key={product.id}
+              variant="outline"
+              className="p-4 h-auto flex flex-col items-start space-y-2 text-left hover:bg-sage-50"
+              onClick={() => handleProductSelect(product.id)}
+            >
+              <div className="font-medium">{product.name}</div>
+              <div className="text-sm text-gray-600">{product.dimensions}</div>
+              <div className="text-sm text-sage-600">₹{product.price.toFixed(2)}</div>
+            </Button>
+          ))}
         </div>
       </div>
     </Card>
