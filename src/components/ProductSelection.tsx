@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Product } from "@/lib/types";
@@ -19,10 +20,12 @@ export const ProductSelection: React.FC<ProductSelectionProps> = ({
     addProductToInvoice(productId, 1); // Default quantity to 1
   };
 
-  const searchedProducts = filteredProducts.filter(product =>
-    product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    product.dimensions.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const searchedProducts = searchQuery.trim() !== "" 
+    ? filteredProducts.filter(product =>
+        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.dimensions.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : [];
 
   return (
     <Card className="p-6 space-y-4">
@@ -40,20 +43,27 @@ export const ProductSelection: React.FC<ProductSelectionProps> = ({
           />
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {searchedProducts.map((product) => (
-            <Button
-              key={product.id}
-              variant="outline"
-              className="p-4 h-auto flex flex-col items-start space-y-2 text-left hover:bg-sage-50"
-              onClick={() => handleProductSelect(product.id)}
-            >
-              <div className="font-medium">{product.name}</div>
-              <div className="text-sm text-gray-600">{product.dimensions}</div>
-              <div className="text-sm text-sage-600">₹{product.price.toFixed(2)}</div>
-            </Button>
-          ))}
-        </div>
+        {searchQuery.trim() !== "" && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {searchedProducts.map((product) => (
+              <Button
+                key={product.id}
+                variant="outline"
+                className="p-4 h-auto flex flex-col items-start space-y-2 text-left hover:bg-sage-50"
+                onClick={() => handleProductSelect(product.id)}
+              >
+                <div className="font-medium">{product.name}</div>
+                <div className="text-sm text-gray-600">{product.dimensions}</div>
+                <div className="text-sm text-sage-600">₹{product.price.toFixed(2)}</div>
+              </Button>
+            ))}
+            {searchedProducts.length === 0 && (
+              <div className="col-span-full text-center text-gray-500">
+                No products found matching your search
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </Card>
   );
