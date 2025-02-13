@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Product } from "@/lib/types";
+import { Input } from "@/components/ui/input";
 
 interface ProductSelectionProps {
   filteredProducts: Product[];
@@ -12,28 +13,50 @@ export const ProductSelection: React.FC<ProductSelectionProps> = ({
   filteredProducts,
   addProductToInvoice,
 }) => {
+  const [searchQuery, setSearchQuery] = useState("");
+  
   const handleProductSelect = (productId: string) => {
     addProductToInvoice(productId, 1); // Default quantity to 1
   };
 
+  const searchedProducts = filteredProducts.filter(product =>
+    product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    product.dimensions.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
     <Card className="p-6 space-y-4">
-      <div>
-        <label className="block text-sm font-medium mb-2 text-gray-700">
-          Select Product
-        </label>
-        <Select onValueChange={handleProductSelect}>
-          <SelectTrigger>
-            <SelectValue placeholder="Choose a product" />
-          </SelectTrigger>
-          <SelectContent>
-            {filteredProducts.map((product) => (
-              <SelectItem key={product.id} value={product.id}>
-                {product.name} - {product.dimensions}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+      <div className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium mb-2 text-gray-700">
+            Search Products
+          </label>
+          <Input
+            type="text"
+            placeholder="Search by name or dimensions..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full"
+          />
+        </div>
+        
+        <div>
+          <label className="block text-sm font-medium mb-2 text-gray-700">
+            Select Product
+          </label>
+          <Select onValueChange={handleProductSelect}>
+            <SelectTrigger>
+              <SelectValue placeholder="Choose a product" />
+            </SelectTrigger>
+            <SelectContent>
+              {searchedProducts.map((product) => (
+                <SelectItem key={product.id} value={product.id}>
+                  {product.name} - {product.dimensions}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </div>
     </Card>
   );
