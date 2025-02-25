@@ -28,10 +28,10 @@ export const ProductSelection: React.FC<ProductSelectionProps> = ({
     : [];
 
   return (
-    <Card className="p-6 space-y-4">
+    <Card className="p-4 md:p-6 space-y-4 max-w-full overflow-hidden">
       <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium mb-2 text-gray-700">
+        <div className="sticky top-0 bg-white z-10 pb-2">
+          <label className="block text-base md:text-sm font-medium mb-2 text-gray-700">
             Search Products
           </label>
           <Input
@@ -39,26 +39,26 @@ export const ProductSelection: React.FC<ProductSelectionProps> = ({
             placeholder="Search by name or dimensions..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full"
+            className="w-full text-base md:text-sm h-12 md:h-10 px-4"
           />
         </div>
         
         {searchQuery.trim() !== "" && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 gap-3 overflow-y-auto max-h-[calc(100vh-200px)]">
             {searchedProducts.map((product) => (
               <Button
                 key={product.id}
                 variant="outline"
-                className="p-4 h-auto flex flex-col items-start space-y-2 text-left hover:bg-sage-50"
+                className="w-full p-4 h-auto flex flex-col items-start space-y-2 text-left hover:bg-sage-50 active:bg-sage-100 touch-manipulation"
                 onClick={() => handleProductSelect(product.id)}
               >
-                <div className="font-medium">{product.name}</div>
-                <div className="text-sm text-gray-600">{product.dimensions}</div>
-                <div className="text-sm text-sage-600">₹{product.price.toFixed(2)}</div>
+                <div className="font-medium text-base">{product.name}</div>
+                <div className="text-base text-gray-600">{product.dimensions}</div>
+                <div className="text-base text-sage-600">₹{product.price.toFixed(2)}</div>
               </Button>
             ))}
             {searchedProducts.length === 0 && (
-              <div className="col-span-full text-center text-gray-500">
+              <div className="text-center text-gray-500 py-8 text-base">
                 No products found matching your search
               </div>
             )}
