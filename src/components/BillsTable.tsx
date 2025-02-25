@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import {
   Table,
@@ -49,25 +50,25 @@ export const BillsTable = ({ invoices: initialInvoices, isHistoryView = false }:
   }
 
   return (
-    <div className="w-full overflow-auto">
+    <div className="w-full overflow-x-auto">
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[100px]">Date</TableHead>
-            <TableHead>Customer</TableHead>
-            <TableHead className="text-right">Total</TableHead>
-            <TableHead className="text-center">Status</TableHead>
-            <TableHead className="text-right">Actions</TableHead>
+            <TableHead className="min-w-[100px]">Date</TableHead>
+            <TableHead className="min-w-[150px]">Customer</TableHead>
+            <TableHead className="min-w-[100px] text-right">Total</TableHead>
+            <TableHead className="min-w-[100px] text-center">Status</TableHead>
+            <TableHead className="min-w-[120px] text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {invoices.map((invoice) => (
             <TableRow key={invoice.id} className="hover:bg-muted/50 transition-all">
-              <TableCell className="font-medium">
+              <TableCell className="font-medium whitespace-nowrap">
                 {new Date(invoice.date).toLocaleDateString()}
               </TableCell>
-              <TableCell>{invoice.customerName}</TableCell>
-              <TableCell className="text-right">₹{invoice.total.toFixed(2)}</TableCell>
+              <TableCell className="break-words">{invoice.customerName}</TableCell>
+              <TableCell className="text-right whitespace-nowrap">₹{invoice.total.toFixed(2)}</TableCell>
               <TableCell className="text-center">
                 <span
                   className={`px-2 py-1 rounded-full text-xs ${
@@ -80,7 +81,7 @@ export const BillsTable = ({ invoices: initialInvoices, isHistoryView = false }:
                 </span>
               </TableCell>
               <TableCell className="text-right">
-                <div className="flex justify-end gap-2">
+                <div className="flex justify-end gap-2 flex-wrap">
                   <Button
                     variant="outline"
                     size="sm"
