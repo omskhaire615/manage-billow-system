@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Package, Receipt, TrendingUp } from "lucide-react";
@@ -20,6 +21,8 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { useToast } from "@/hooks/use-toast";
+import { Product, Invoice } from "@/lib/types";
 
 interface TopProduct {
   id: string;
@@ -31,6 +34,7 @@ interface TopProduct {
 }
 
 const Dashboard = () => {
+  const { toast } = useToast();
   const [stats, setStats] = useState({
     totalProducts: 0,
     totalInvoices: 0,
@@ -38,50 +42,72 @@ const Dashboard = () => {
   });
   const [topProducts, setTopProducts] = useState<TopProduct[]>([]);
   const [chartData, setChartData] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const products = storage.getProducts();
-    const invoices = storage.getInvoices();
-    const revenue = invoices.reduce((acc, inv) => acc + inv.total, 0);
+    const fetchData = async () => {
+      try {
+        const [products, invoices] = await Promise.all([
+          storage.getProducts(),
+          storage.getInvoices(),
+        ]);
 
-    // Calculate top selling products
-    const productSales: { [key: string]: TopProduct } = {};
-    
-    invoices.forEach(invoice => {
-      invoice.items.forEach(item => {
-        const product = products.find(p => p.id === item.productId);
-        if (product) {
-          if (!productSales[product.id]) {
-            productSales[product.id] = {
-              id: product.id,
-              name: product.name,
-              totalSold: 0,
-              revenue: 0,
-              imageUrl: product.imageUrl,
-              stock: product.stock,
-            };
-          }
-          productSales[product.id].totalSold += item.quantity;
-          productSales[product.id].revenue += item.quantity * item.price;
-        }
-      });
-    });
+        const revenue = invoices.reduce((acc, inv) => acc + inv.total, 0);
 
-    const topProductsList = Object.values(productSales)
-      .sort((a, b) => b.totalSold - a.totalSold)
-      .slice(0, 5);
+        // Calculate top selling products
+        const productSales: { [key: string]: TopProduct } = {};
+        
+        invoices.forEach(invoice => {
+          invoice.items.forEach(item => {
+            const product = products.find(p => p.id === item.productId);
+            if (product) {
+              if (!productSales[product.id]) {
+                productSales[product.id] = {
+                  id: product.id,
+                  name: product.name,
+                  totalSold: 0,
+                  revenue: 0,
+                  imageUrl: product.imageUrl,
+                  stock: product.stock,
+                };
+              }
+              productSales[product.id].totalSold += item.quantity;
+              productSales[product.id].revenue += item.quantity * item.price;
+            }
+          });
+        });
 
-    setTopProducts(topProductsList);
-    setChartData(topProductsList.map(product => ({
-      name: product.name,
-      sales: product.totalSold,
-    })));
-    setStats({
-      totalProducts: products.length,
-      totalInvoices: invoices.length,
-      totalRevenue: revenue,
-    });
-  }, []);
+        const topProductsList = Object.values(productSales)
+          .sort((a, b) => b.totalSold - a.totalSold)
+          .slice(0, 5);
+
+        setTopProducts(topProductsList);
+        setChartData(topProductsList.map(product => ({
+          name: product.name,
+          sales: product.totalSold,
+        })));
+        setStats({
+          totalProducts: products.length,
+          totalInvoices: invoices.length,
+          totalRevenue: revenue,
+        });
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to fetch dashboard data",
+          variant: "destructive",
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [toast]);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="space-y-8">
