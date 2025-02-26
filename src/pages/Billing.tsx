@@ -1,5 +1,4 @@
-
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -17,8 +16,7 @@ import { BillsTable } from "@/components/BillsTable";
 const Billing = () => {
   const { products, updateProduct } = useProducts();
   const { toast } = useToast();
-  const [invoices, setInvoices] = useState<Invoice[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [invoices, setInvoices] = useState<Invoice[]>(storage.getInvoices());
   const [isCreating, setIsCreating] = useState(false);
   const [selectedProducts, setSelectedProducts] = useState<
     { product: Product; quantity: number }[]
@@ -27,25 +25,6 @@ const Billing = () => {
   const [customerAddress, setCustomerAddress] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
   const [showPDF, setShowPDF] = useState<Invoice | null>(null);
-
-  useEffect(() => {
-    const fetchInvoices = async () => {
-      try {
-        const fetchedInvoices = await storage.getInvoices();
-        setInvoices(fetchedInvoices);
-      } catch (error) {
-        toast({
-          title: "Error",
-          description: "Failed to fetch invoices",
-          variant: "destructive",
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    fetchInvoices();
-  }, [toast]);
 
   const addProductToInvoice = (productId: string, quantity: number) => {
     const product = products.find((p) => p.id === productId);
@@ -77,7 +56,7 @@ const Billing = () => {
     }
   };
 
-  const createInvoice = async () => {
+  const createInvoice = () => {
     if (!customerName || !customerAddress || !customerPhone || selectedProducts.length === 0) {
       toast({
         title: "Error",
@@ -87,47 +66,38 @@ const Billing = () => {
       return;
     }
 
-    try {
-      selectedProducts.forEach(({ product, quantity }) => {
-        updateProductStock(product.id, quantity);
-      });
+    selectedProducts.forEach(({ product, quantity }) => {
+      updateProductStock(product.id, quantity);
+    });
 
-      const newInvoice: Invoice = {
-        id: crypto.randomUUID(),
-        customerName,
-        address: customerAddress,
-        phone: customerPhone,
-        items: selectedProducts.map(({ product, quantity }) => ({
-          productId: product.id,
-          quantity,
-          price: product.price,
-        })),
-        total: calculateTotal(),
-        date: new Date().toISOString(),
-        status: "pending",
-      };
+    const newInvoice: Invoice = {
+      id: crypto.randomUUID(),
+      customerName,
+      address: customerAddress,
+      phone: customerPhone,
+      items: selectedProducts.map(({ product, quantity }) => ({
+        productId: product.id,
+        quantity,
+        price: product.price,
+      })),
+      total: calculateTotal(),
+      date: new Date().toISOString(),
+      status: "pending",
+    };
 
-      await storage.saveInvoice(newInvoice);
-      const updatedInvoices = await storage.getInvoices();
-      setInvoices(updatedInvoices);
-      setShowPDF(newInvoice);
-      setIsCreating(false);
-      setSelectedProducts([]);
-      setCustomerName("");
-      setCustomerAddress("");
-      setCustomerPhone("");
+    storage.saveInvoice(newInvoice);
+    setInvoices(storage.getInvoices());
+    setShowPDF(newInvoice);
+    setIsCreating(false);
+    setSelectedProducts([]);
+    setCustomerName("");
+    setCustomerAddress("");
+    setCustomerPhone("");
 
-      toast({
-        title: "Invoice created",
-        description: `Invoice for ${customerName} has been created successfully.`,
-      });
-    } catch (error) {
-      toast({
-        title: "Error",
-        description: "Failed to create invoice",
-        variant: "destructive",
-      });
-    }
+    toast({
+      title: "Invoice created",
+      description: `Invoice for ${customerName} has been created successfully.`,
+    });
   };
 
   if (showPDF) {
@@ -137,10 +107,6 @@ const Billing = () => {
         <InvoicePDF invoice={showPDF} products={products} />
       </div>
     );
-  }
-
-  if (isLoading) {
-    return <div>Loading...</div>;
   }
 
   return (

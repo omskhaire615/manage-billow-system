@@ -1,47 +1,19 @@
-
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { storage } from "@/lib/storage";
 import { BillsTable } from "@/components/BillsTable";
 import { Search } from "lucide-react";
-import { Invoice } from "@/lib/types";
-import { useToast } from "@/hooks/use-toast";
 
 const BillingHistory = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [invoices, setInvoices] = useState<Invoice[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const { toast } = useToast();
-
-  useEffect(() => {
-    const fetchInvoices = async () => {
-      try {
-        const fetchedInvoices = await storage.getInvoices();
-        setInvoices(fetchedInvoices);
-      } catch (error) {
-        toast({
-          title: "Error",
-          description: "Failed to fetch invoices",
-          variant: "destructive",
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchInvoices();
-  }, [toast]);
+  const allInvoices = storage.getInvoices();
   
-  const filteredInvoices = invoices
+  const filteredInvoices = allInvoices
     .filter((invoice) =>
       invoice.customerName.toLowerCase().includes(searchQuery.toLowerCase())
     )
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
 
   return (
     <div className="space-y-6">
