@@ -1,66 +1,153 @@
+
+import axios from 'axios';
 import { Product, Invoice, Category } from './types';
 
-const STORAGE_KEYS = {
-  PRODUCTS: 'products',
-  INVOICES: 'invoices',
-  CATEGORIES: 'categories',
+// Replace these with your MongoDB Atlas Data API credentials
+const DATA_API_URL = 'YOUR_MONGODB_DATA_API_ENDPOINT';
+const API_KEY = 'YOUR_API_KEY';
+
+const headers = {
+  'Content-Type': 'application/json',
+  'Access-Control-Request-Headers': '*',
+  'api-key': API_KEY,
 };
 
 export const storage = {
-  getProducts: (): Product[] => {
-    const data = localStorage.getItem(STORAGE_KEYS.PRODUCTS);
-    return data ? JSON.parse(data) : [];
-  },
-
-  saveProduct: (product: Product) => {
-    const products = storage.getProducts();
-    const index = products.findIndex(p => p.id === product.id);
-    
-    if (index > -1) {
-      products[index] = { ...product, updatedAt: new Date().toISOString() };
-    } else {
-      products.push({
-        ...product,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      });
+  getProducts: async (): Promise<Product[]> => {
+    try {
+      const response = await axios.post(`${DATA_API_URL}/find`, {
+        collection: 'products',
+        database: 'om_traders',
+        dataSource: 'Cluster0',
+      }, { headers });
+      return response.data.documents || [];
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      return [];
     }
-    
-    localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(products));
   },
 
-  deleteProduct: (id: string) => {
-    const products = storage.getProducts().filter(p => p.id !== id);
-    localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(products));
+  saveProduct: async (product: Product) => {
+    try {
+      if (product.id) {
+        // Update existing product
+        await axios.post(`${DATA_API_URL}/updateOne`, {
+          collection: 'products',
+          database: 'om_traders',
+          dataSource: 'Cluster0',
+          filter: { id: product.id },
+          update: {
+            $set: {
+              ...product,
+              updatedAt: new Date().toISOString(),
+            },
+          },
+          upsert: true,
+        }, { headers });
+      } else {
+        // Insert new product
+        await axios.post(`${DATA_API_URL}/insertOne`, {
+          collection: 'products',
+          database: 'om_traders',
+          dataSource: 'Cluster0',
+          document: {
+            ...product,
+            id: crypto.randomUUID(),
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          },
+        }, { headers });
+      }
+    } catch (error) {
+      console.error('Error saving product:', error);
+      throw error;
+    }
   },
 
-  getInvoices: (): Invoice[] => {
-    const data = localStorage.getItem(STORAGE_KEYS.INVOICES);
-    return data ? JSON.parse(data) : [];
+  deleteProduct: async (id: string) => {
+    try {
+      await axios.post(`${DATA_API_URL}/deleteOne`, {
+        collection: 'products',
+        database: 'om_traders',
+        dataSource: 'Cluster0',
+        filter: { id },
+      }, { headers });
+    } catch (error) {
+      console.error('Error deleting product:', error);
+      throw error;
+    }
   },
 
-  saveInvoice: (invoice: Invoice) => {
-    const invoices = storage.getInvoices();
-    invoices.push(invoice);
-    localStorage.setItem(STORAGE_KEYS.INVOICES, JSON.stringify(invoices));
+  getInvoices: async (): Promise<Invoice[]> => {
+    try {
+      const response = await axios.post(`${DATA_API_URL}/find`, {
+        collection: 'invoices',
+        database: 'om_traders',
+        dataSource: 'Cluster0',
+      }, { headers });
+      return response.data.documents || [];
+    } catch (error) {
+      console.error('Error fetching invoices:', error);
+      return [];
+    }
   },
 
-  updateInvoiceStatus: (invoiceId: string, status: "paid" | "pending") => {
-    const invoices = storage.getInvoices();
-    const updatedInvoices = invoices.map(invoice =>
-      invoice.id === invoiceId ? { ...invoice, status } : invoice
-    );
-    localStorage.setItem(STORAGE_KEYS.INVOICES, JSON.stringify(updatedInvoices));
+  saveInvoice: async (invoice: Invoice) => {
+    try {
+      await axios.post(`${DATA_API_URL}/insertOne`, {
+        collection: 'invoices',
+        database: 'om_traders',
+        dataSource: 'Cluster0',
+        document: invoice,
+      }, { headers });
+    } catch (error) {
+      console.error('Error saving invoice:', error);
+      throw error;
+    }
   },
 
-  getCategories: (): Category[] => {
-    const data = localStorage.getItem(STORAGE_KEYS.CATEGORIES);
-    return data ? JSON.parse(data) : [];
+  updateInvoiceStatus: async (invoiceId: string, status: "paid" | "pending") => {
+    try {
+      await axios.post(`${DATA_API_URL}/updateOne`, {
+        collection: 'invoices',
+        database: 'om_traders',
+        dataSource: 'Cluster0',
+        filter: { id: invoiceId },
+        update: {
+          $set: { status },
+        },
+      }, { headers });
+    } catch (error) {
+      console.error('Error updating invoice status:', error);
+      throw error;
+    }
   },
 
-  saveCategory: (category: Category) => {
-    const categories = storage.getCategories();
-    categories.push(category);
-    localStorage.setItem(STORAGE_KEYS.CATEGORIES, JSON.stringify(categories));
+  getCategories: async (): Promise<Category[]> => {
+    try {
+      const response = await axios.post(`${DATA_API_URL}/find`, {
+        collection: 'categories',
+        database: 'om_traders',
+        dataSource: 'Cluster0',
+      }, { headers });
+      return response.data.documents || [];
+    } catch (error) {
+      console.error('Error fetching categories:', error);
+      return [];
+    }
+  },
+
+  saveCategory: async (category: Category) => {
+    try {
+      await axios.post(`${DATA_API_URL}/insertOne`, {
+        collection: 'categories',
+        database: 'om_traders',
+        dataSource: 'Cluster0',
+        document: category,
+      }, { headers });
+    } catch (error) {
+      console.error('Error saving category:', error);
+      throw error;
+    }
   },
 };
