@@ -1,66 +1,169 @@
+
 import { Product, Invoice, Category } from './types';
 
-const STORAGE_KEYS = {
+// Replace these with your actual MongoDB Data API information
+const DATA_API_URL = 'YOUR_MONGODB_DATA_API_ENDPOINT';
+const API_KEY = 'YOUR_API_KEY';
+const DATABASE = 'inventory_management';
+
+// Collection names
+const COLLECTIONS = {
   PRODUCTS: 'products',
   INVOICES: 'invoices',
   CATEGORIES: 'categories',
 };
 
-export const storage = {
-  getProducts: (): Product[] => {
-    const data = localStorage.getItem(STORAGE_KEYS.PRODUCTS);
-    return data ? JSON.parse(data) : [];
-  },
+// Helper function for making API requests to MongoDB Data API
+const fetchFromMongoDB = async (action: string, collection: string, data: any = {}) => {
+  try {
+    const response = await fetch(`${DATA_API_URL}/${action}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'api-key': API_KEY,
+      },
+      body: JSON.stringify({
+        dataSource: 'Cluster0', // Replace with your cluster name if different
+        database: DATABASE,
+        collection,
+        ...data,
+      }),
+    });
 
-  saveProduct: (product: Product) => {
-    const products = storage.getProducts();
-    const index = products.findIndex(p => p.id === product.id);
-    
-    if (index > -1) {
-      products[index] = { ...product, updatedAt: new Date().toISOString() };
-    } else {
-      products.push({
-        ...product,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`MongoDB API Error: ${errorData.error || response.statusText}`);
     }
-    
-    localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(products));
+
+    return await response.json();
+  } catch (error) {
+    console.error('MongoDB API request failed:', error);
+    throw error;
+  }
+};
+
+export const storage = {
+  // Products
+  getProducts: async (): Promise<Product[]> => {
+    try {
+      const result = await fetchFromMongoDB('find', COLLECTIONS.PRODUCTS);
+      return result.documents || [];
+    } catch (error) {
+      console.error('Failed to fetch products:', error);
+      return [];
+    }
   },
 
-  deleteProduct: (id: string) => {
-    const products = storage.getProducts().filter(p => p.id !== id);
-    localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(products));
+  saveProduct: async (product: Product): Promise<void> => {
+    try {
+      const products = await storage.getProducts();
+      const index = products.findIndex(p => p.id === product.id);
+      
+      if (index > -1) {
+        // Update existing product
+        const updatedProduct = { 
+          ...product, 
+          updatedAt: new Date().toISOString() 
+        };
+        
+        await fetchFromMongoDB('updateOne', COLLECTIONS.PRODUCTS, {
+          filter: { id: product.id },
+          update: { $set: updatedProduct },
+          upsert: true
+        });
+      } else {
+        // Insert new product
+        const newProduct = {
+          ...product,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+        
+        await fetchFromMongoDB('insertOne', COLLECTIONS.PRODUCTS, {
+          document: newProduct
+        });
+      }
+    } catch (error) {
+      console.error('Failed to save product:', error);
+      throw error;
+    }
   },
 
-  getInvoices: (): Invoice[] => {
-    const data = localStorage.getItem(STORAGE_KEYS.INVOICES);
-    return data ? JSON.parse(data) : [];
+  deleteProduct: async (id: string): Promise<void> => {
+    try {
+      await fetchFromMongoDB('deleteOne', COLLECTIONS.PRODUCTS, {
+        filter: { id }
+      });
+    } catch (error) {
+      console.error('Failed to delete product:', error);
+      throw error;
+    }
   },
 
-  saveInvoice: (invoice: Invoice) => {
-    const invoices = storage.getInvoices();
-    invoices.push(invoice);
-    localStorage.setItem(STORAGE_KEYS.INVOICES, JSON.stringify(invoices));
+  // Invoices
+  getInvoices: async (): Promise<Invoice[]> => {
+    try {
+      const result = await fetchFromMongoDB('find', COLLECTIONS.INVOICES);
+      return result.documents || [];
+    } catch (error) {
+      console.error('Failed to fetch invoices:', error);
+      return [];
+    }
   },
 
-  updateInvoiceStatus: (invoiceId: string, status: "paid" | "pending") => {
-    const invoices = storage.getInvoices();
-    const updatedInvoices = invoices.map(invoice =>
-      invoice.id === invoiceId ? { ...invoice, status } : invoice
-    );
-    localStorage.setItem(STORAGE_KEYS.INVOICES, JSON.stringify(updatedInvoices));
+  saveInvoice: async (invoice: Invoice): Promise<void> => {
+    try {
+      await fetchFromMongoDB('insertOne', COLLECTIONS.INVOICES, {
+        document: invoice
+      });
+    } catch (error) {
+      console.error('Failed to save invoice:', error);
+      throw error;
+    }
   },
 
-  getCategories: (): Category[] => {
-    const data = localStorage.getItem(STORAGE_KEYS.CATEGORIES);
-    return data ? JSON.parse(data) : [];
+  updateInvoiceStatus: async (invoiceId: string, status: "paid" | "pending"): Promise<void> => {
+    try {
+      await fetchFromMongoDB('updateOne', COLLECTIONS.INVOICES, {
+        filter: { id: invoiceId },
+        update: { $set: { status } }
+      });
+    } catch (error) {
+      console.error('Failed to update invoice status:', error);
+      throw error;
+    }
   },
 
-  saveCategory: (category: Category) => {
-    const categories = storage.getCategories();
-    categories.push(category);
-    localStorage.setItem(STORAGE_KEYS.CATEGORIES, JSON.stringify(categories));
+  // Categories
+  getCategories: async (): Promise<Category[]> => {
+    try {
+      const result = await fetchFromMongoDB('find', COLLECTIONS.CATEGORIES);
+      return result.documents || [];
+    } catch (error) {
+      console.error('Failed to fetch categories:', error);
+      return [];
+    }
   },
+
+  saveCategory: async (category: Category): Promise<void> => {
+    try {
+      await fetchFromMongoDB('insertOne', COLLECTIONS.CATEGORIES, {
+        document: category
+      });
+    } catch (error) {
+      console.error('Failed to save category:', error);
+      throw error;
+    }
+  },
+
+  // Test connection to MongoDB
+  testConnection: async (): Promise<boolean> => {
+    try {
+      await fetchFromMongoDB('find', COLLECTIONS.PRODUCTS, { limit: 1 });
+      return true;
+    } catch (error) {
+      console.error('MongoDB connection test failed:', error);
+      return false;
+    }
+  }
 };

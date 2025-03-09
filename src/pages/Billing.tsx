@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+
+import React, { useState, useEffect } from "react";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -14,10 +15,11 @@ import { ProductSelection } from "@/components/ProductSelection";
 import { BillsTable } from "@/components/BillsTable";
 
 const Billing = () => {
-  const { products, updateProduct } = useProducts();
+  const { products, updateProduct, loading: productsLoading } = useProducts();
   const { toast } = useToast();
-  const [invoices, setInvoices] = useState<Invoice[]>(storage.getInvoices());
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
   const [isCreating, setIsCreating] = useState(false);
+  const [loadingInvoices, setLoadingInvoices] = useState(true);
   const [selectedProducts, setSelectedProducts] = useState<
     { product: Product; quantity: number }[]
   >([]);
@@ -25,6 +27,27 @@ const Billing = () => {
   const [customerAddress, setCustomerAddress] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
   const [showPDF, setShowPDF] = useState<Invoice | null>(null);
+
+  useEffect(() => {
+    const fetchInvoices = async () => {
+      try {
+        setLoadingInvoices(true);
+        const invoicesData = await storage.getInvoices();
+        setInvoices(invoicesData);
+      } catch (error) {
+        console.error('Failed to fetch invoices:', error);
+        toast({
+          title: "Error fetching invoices",
+          description: "Couldn't load invoices. Please try again.",
+          variant: "destructive",
+        });
+      } finally {
+        setLoadingInvoices(false);
+      }
+    };
+
+    fetchInvoices();
+  }, [toast]);
 
   const addProductToInvoice = (productId: string, quantity: number) => {
     const product = products.find((p) => p.id === productId);
@@ -46,17 +69,17 @@ const Billing = () => {
     );
   };
 
-  const updateProductStock = (productId: string, quantity: number) => {
+  const updateProductStock = async (productId: string, quantity: number) => {
     const product = products.find((p) => p.id === productId);
     if (product) {
-      updateProduct({
+      await updateProduct({
         ...product,
         stock: product.stock - quantity,
       });
     }
   };
 
-  const createInvoice = () => {
+  const createInvoice = async () => {
     if (!customerName || !customerAddress || !customerPhone || selectedProducts.length === 0) {
       toast({
         title: "Error",
@@ -66,38 +89,48 @@ const Billing = () => {
       return;
     }
 
-    selectedProducts.forEach(({ product, quantity }) => {
-      updateProductStock(product.id, quantity);
-    });
+    try {
+      for (const { product, quantity } of selectedProducts) {
+        await updateProductStock(product.id, quantity);
+      }
 
-    const newInvoice: Invoice = {
-      id: crypto.randomUUID(),
-      customerName,
-      address: customerAddress,
-      phone: customerPhone,
-      items: selectedProducts.map(({ product, quantity }) => ({
-        productId: product.id,
-        quantity,
-        price: product.price,
-      })),
-      total: calculateTotal(),
-      date: new Date().toISOString(),
-      status: "pending",
-    };
+      const newInvoice: Invoice = {
+        id: crypto.randomUUID(),
+        customerName,
+        address: customerAddress,
+        phone: customerPhone,
+        items: selectedProducts.map(({ product, quantity }) => ({
+          productId: product.id,
+          quantity,
+          price: product.price,
+        })),
+        total: calculateTotal(),
+        date: new Date().toISOString(),
+        status: "pending",
+      };
 
-    storage.saveInvoice(newInvoice);
-    setInvoices(storage.getInvoices());
-    setShowPDF(newInvoice);
-    setIsCreating(false);
-    setSelectedProducts([]);
-    setCustomerName("");
-    setCustomerAddress("");
-    setCustomerPhone("");
+      await storage.saveInvoice(newInvoice);
+      const updatedInvoices = await storage.getInvoices();
+      setInvoices(updatedInvoices);
+      setShowPDF(newInvoice);
+      setIsCreating(false);
+      setSelectedProducts([]);
+      setCustomerName("");
+      setCustomerAddress("");
+      setCustomerPhone("");
 
-    toast({
-      title: "Invoice created",
-      description: `Invoice for ${customerName} has been created successfully.`,
-    });
+      toast({
+        title: "Invoice created",
+        description: `Invoice for ${customerName} has been created successfully.`,
+      });
+    } catch (error) {
+      console.error('Failed to create invoice:', error);
+      toast({
+        title: "Error creating invoice",
+        description: "There was a problem creating the invoice.",
+        variant: "destructive",
+      });
+    }
   };
 
   if (showPDF) {
@@ -105,6 +138,16 @@ const Billing = () => {
       <div className="space-y-4">
         <Button onClick={() => setShowPDF(null)}>Back to Billing</Button>
         <InvoicePDF invoice={showPDF} products={products} />
+      </div>
+    );
+  }
+
+  const loading = productsLoading || loadingInvoices;
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-[80vh]">
+        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-sage-500"></div>
       </div>
     );
   }

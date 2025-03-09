@@ -1,15 +1,41 @@
-import React, { useState } from "react";
+
+import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { storage } from "@/lib/storage";
 import { BillsTable } from "@/components/BillsTable";
 import { Search } from "lucide-react";
+import { Invoice } from "@/lib/types";
+import { useToast } from "@/hooks/use-toast";
 
 const BillingHistory = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const allInvoices = storage.getInvoices();
+  const [invoices, setInvoices] = useState<Invoice[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    const fetchInvoices = async () => {
+      try {
+        setLoading(true);
+        const allInvoices = await storage.getInvoices();
+        setInvoices(allInvoices);
+      } catch (error) {
+        console.error('Failed to fetch invoices:', error);
+        toast({
+          title: "Error fetching invoices",
+          description: "Couldn't load invoice history. Please try again.",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchInvoices();
+  }, [toast]);
   
-  const filteredInvoices = allInvoices
+  const filteredInvoices = invoices
     .filter((invoice) =>
       invoice.customerName.toLowerCase().includes(searchQuery.toLowerCase())
     )
@@ -32,7 +58,13 @@ const BillingHistory = () => {
       </div>
 
       <Card className="p-6">
-        <BillsTable invoices={filteredInvoices} isHistoryView={true} />
+        {loading ? (
+          <div className="flex justify-center p-6">
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-sage-500"></div>
+          </div>
+        ) : (
+          <BillsTable invoices={filteredInvoices} isHistoryView={true} />
+        )}
       </Card>
     </div>
   );

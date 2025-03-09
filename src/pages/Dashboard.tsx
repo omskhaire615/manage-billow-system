@@ -20,6 +20,8 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { Product, Invoice } from "@/lib/types";
+import { useToast } from "@/hooks/use-toast";
 
 interface TopProduct {
   id: string;
@@ -38,50 +40,79 @@ const Dashboard = () => {
   });
   const [topProducts, setTopProducts] = useState<TopProduct[]>([]);
   const [chartData, setChartData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
-    const products = storage.getProducts();
-    const invoices = storage.getInvoices();
-    const revenue = invoices.reduce((acc, inv) => acc + inv.total, 0);
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const [products, invoices] = await Promise.all([
+          storage.getProducts(),
+          storage.getInvoices()
+        ]);
+        
+        const revenue = invoices.reduce((acc, inv) => acc + inv.total, 0);
 
-    // Calculate top selling products
-    const productSales: { [key: string]: TopProduct } = {};
-    
-    invoices.forEach(invoice => {
-      invoice.items.forEach(item => {
-        const product = products.find(p => p.id === item.productId);
-        if (product) {
-          if (!productSales[product.id]) {
-            productSales[product.id] = {
-              id: product.id,
-              name: product.name,
-              totalSold: 0,
-              revenue: 0,
-              imageUrl: product.imageUrl,
-              stock: product.stock,
-            };
-          }
-          productSales[product.id].totalSold += item.quantity;
-          productSales[product.id].revenue += item.quantity * item.price;
-        }
-      });
-    });
+        // Calculate top selling products
+        const productSales: { [key: string]: TopProduct } = {};
+        
+        invoices.forEach(invoice => {
+          invoice.items.forEach(item => {
+            const product = products.find(p => p.id === item.productId);
+            if (product) {
+              if (!productSales[product.id]) {
+                productSales[product.id] = {
+                  id: product.id,
+                  name: product.name,
+                  totalSold: 0,
+                  revenue: 0,
+                  imageUrl: product.imageUrl,
+                  stock: product.stock,
+                };
+              }
+              productSales[product.id].totalSold += item.quantity;
+              productSales[product.id].revenue += item.quantity * item.price;
+            }
+          });
+        });
 
-    const topProductsList = Object.values(productSales)
-      .sort((a, b) => b.totalSold - a.totalSold)
-      .slice(0, 5);
+        const topProductsList = Object.values(productSales)
+          .sort((a, b) => b.totalSold - a.totalSold)
+          .slice(0, 5);
 
-    setTopProducts(topProductsList);
-    setChartData(topProductsList.map(product => ({
-      name: product.name,
-      sales: product.totalSold,
-    })));
-    setStats({
-      totalProducts: products.length,
-      totalInvoices: invoices.length,
-      totalRevenue: revenue,
-    });
-  }, []);
+        setTopProducts(topProductsList);
+        setChartData(topProductsList.map(product => ({
+          name: product.name,
+          sales: product.totalSold,
+        })));
+        setStats({
+          totalProducts: products.length,
+          totalInvoices: invoices.length,
+          totalRevenue: revenue,
+        });
+      } catch (error) {
+        console.error('Failed to fetch dashboard data:', error);
+        toast({
+          title: "Error loading dashboard",
+          description: "There was a problem loading dashboard data.",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [toast]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-[80vh]">
+        <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-sage-500"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
