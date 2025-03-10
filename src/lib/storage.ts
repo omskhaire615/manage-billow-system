@@ -35,7 +35,7 @@ class MongoDBStorage implements Storage {
   private dataSource = 'AtlasCluster';
   private baseApiUrl = 'https://data.mongodb-api.com/app/data-xbfvi/endpoint/data/v1';
 
-  private async executeRequest(action: string, collection: string, document?: any, filter?: any) {
+  private async executeRequest(action: string, collection: string, document?: any, filter?: any, update?: any) {
     const url = this.baseApiUrl + '/action/' + action;
     
     const body: any = {
@@ -50,6 +50,10 @@ class MongoDBStorage implements Storage {
     
     if (filter) {
       body.filter = filter;
+    }
+    
+    if (update) {
+      body.update = update;
     }
     
     try {
@@ -163,6 +167,7 @@ class MongoDBStorage implements Storage {
   }
 
   isUsingFallback(): boolean {
+    // When API key is properly set, we're not using fallback
     return this.apiKey === '' || this.baseApiUrl === '';
   }
 
@@ -234,4 +239,5 @@ class FallbackStorage implements Storage {
 const mongodbStorage = new MongoDBStorage();
 const fallbackStorage = new FallbackStorage();
 
+// Use MongoDB storage as primary, with fallback to localStorage
 export const storage: Storage = mongodbStorage;
