@@ -11,6 +11,7 @@ interface ProductContextType {
   updateProduct: (product: Product) => Promise<void>;
   deleteProduct: (id: string) => Promise<void>;
   refreshProducts: () => Promise<void>;
+  usingLocalStorage: boolean;
 }
 
 const ProductContext = createContext<ProductContextType | undefined>(undefined);
@@ -18,7 +19,26 @@ const ProductContext = createContext<ProductContextType | undefined>(undefined);
 export function ProductProvider({ children }: { children: React.ReactNode }) {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [usingLocalStorage, setUsingLocalStorage] = useState(false);
   const { toast } = useToast();
+
+  // Check if we're using localStorage or MongoDB
+  useEffect(() => {
+    const checkStorageMode = async () => {
+      const isUsingFallback = storage.isUsingFallback();
+      setUsingLocalStorage(isUsingFallback);
+      
+      if (isUsingFallback) {
+        toast({
+          title: "Using Local Storage",
+          description: "MongoDB connection not available. Using browser storage instead.",
+          variant: "default",
+        });
+      }
+    };
+    
+    checkStorageMode();
+  }, [toast]);
 
   const refreshProducts = async () => {
     try {
@@ -61,7 +81,9 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
       console.error('Failed to add product:', error);
       toast({
         title: "Error adding product",
-        description: "There was a problem adding the product.",
+        description: usingLocalStorage 
+          ? "There was a problem saving to browser storage."
+          : "There was a problem connecting to MongoDB. Check your API credentials.",
         variant: "destructive",
       });
     }
@@ -80,7 +102,9 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
       console.error('Failed to update product:', error);
       toast({
         title: "Error updating product",
-        description: "There was a problem updating the product.",
+        description: usingLocalStorage 
+          ? "There was a problem saving to browser storage."
+          : "There was a problem connecting to MongoDB. Check your API credentials.",
         variant: "destructive",
       });
     }
@@ -99,7 +123,9 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
       console.error('Failed to delete product:', error);
       toast({
         title: "Error deleting product",
-        description: "There was a problem deleting the product.",
+        description: usingLocalStorage 
+          ? "There was a problem removing from browser storage."
+          : "There was a problem connecting to MongoDB. Check your API credentials.",
         variant: "destructive",
       });
     }
@@ -113,7 +139,8 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
         addProduct, 
         updateProduct, 
         deleteProduct, 
-        refreshProducts 
+        refreshProducts,
+        usingLocalStorage 
       }}
     >
       {children}

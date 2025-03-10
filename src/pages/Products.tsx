@@ -1,5 +1,6 @@
+
 import React, { useState } from "react";
-import { Plus } from "lucide-react";
+import { Plus, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Table,
@@ -15,9 +16,10 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { LowStockAlert } from "@/components/LowStockAlert";
 import { ProductSearch } from "@/components/ProductSearch";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const Products = () => {
-  const { products, addProduct, updateProduct, deleteProduct } = useProducts();
+  const { products, loading, addProduct, updateProduct, deleteProduct, usingLocalStorage } = useProducts();
   const [isAdding, setIsAdding] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -53,6 +55,17 @@ const Products = () => {
     <div className="space-y-8 animate-fadeIn">
       <LowStockAlert />
       
+      {usingLocalStorage && (
+        <Alert className="bg-amber-50 border-amber-200">
+          <AlertCircle className="h-4 w-4 text-amber-500" />
+          <AlertTitle className="text-amber-700">Using Local Storage</AlertTitle>
+          <AlertDescription className="text-amber-700">
+            MongoDB connection is not available. Your data is stored in your browser and will be lost if you clear browser data.
+            Check MongoDB API credentials in storage.ts.
+          </AlertDescription>
+        </Alert>
+      )}
+
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-semibold text-sage-900">Products</h1>
         <Button
@@ -151,59 +164,82 @@ const Products = () => {
       )}
 
       <Card className="animate-fadeIn">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Image</TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Price</TableHead>
-              <TableHead>Dimensions</TableHead>
-              <TableHead>Stock</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredProducts.map((product) => (
-              <TableRow key={product.id} className="hover:bg-sage-50 transition-colors duration-200">
-                <TableCell>
-                  <img 
-                    src={product.imageUrl} 
-                    alt={product.name} 
-                    className="w-12 h-12 object-cover rounded-md"
-                  />
-                </TableCell>
-                <TableCell>{product.name}</TableCell>
-                <TableCell>₹{product.price.toFixed(2)}</TableCell>
-                <TableCell>{product.dimensions}</TableCell>
-                <TableCell>
-                  <span className={product.stock < 5 ? "text-red-500 font-bold" : ""}>
-                    {product.stock}
-                  </span>
-                </TableCell>
-                <TableCell>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setEditingProduct(product)}
-                      className="hover:bg-sage-50 transition-colors duration-300"
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      variant="destructive"
-                      size="sm"
-                      onClick={() => deleteProduct(product.id)}
-                      className="hover:bg-red-600 transition-colors duration-300"
-                    >
-                      Delete
-                    </Button>
-                  </div>
-                </TableCell>
+        {loading ? (
+          <div className="flex justify-center p-12">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-sage-500"></div>
+          </div>
+        ) : (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Image</TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead>Price</TableHead>
+                <TableHead>Dimensions</TableHead>
+                <TableHead>Stock</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {filteredProducts.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center py-8 text-gray-500">
+                    No products found. Add your first product!
+                  </TableCell>
+                </TableRow>
+              ) : (
+                filteredProducts.map((product) => (
+                  <TableRow key={product.id} className="hover:bg-sage-50 transition-colors duration-200">
+                    <TableCell>
+                      {product.imageUrl ? (
+                        <img 
+                          src={product.imageUrl} 
+                          alt={product.name} 
+                          className="w-12 h-12 object-cover rounded-md"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = '/placeholder.svg';
+                          }}
+                        />
+                      ) : (
+                        <div className="w-12 h-12 bg-gray-100 rounded-md flex items-center justify-center text-gray-400">
+                          No img
+                        </div>
+                      )}
+                    </TableCell>
+                    <TableCell>{product.name}</TableCell>
+                    <TableCell>₹{product.price.toFixed(2)}</TableCell>
+                    <TableCell>{product.dimensions}</TableCell>
+                    <TableCell>
+                      <span className={product.stock < 5 ? "text-red-500 font-bold" : ""}>
+                        {product.stock}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setEditingProduct(product)}
+                          className="hover:bg-sage-50 transition-colors duration-300"
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => deleteProduct(product.id)}
+                          className="hover:bg-red-600 transition-colors duration-300"
+                        >
+                          Delete
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        )}
       </Card>
     </div>
   );
