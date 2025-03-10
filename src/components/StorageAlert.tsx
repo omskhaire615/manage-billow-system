@@ -1,6 +1,6 @@
 
 import React from "react";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Database } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 interface StorageAlertProps {
@@ -8,7 +8,17 @@ interface StorageAlertProps {
 }
 
 export const StorageAlert = ({ usingLocalStorage }: StorageAlertProps) => {
-  if (!usingLocalStorage) return null;
+  if (!usingLocalStorage) {
+    return (
+      <Alert className="bg-green-50 border-green-200">
+        <Database className="h-4 w-4 text-green-500" />
+        <AlertTitle className="text-green-700">Connected to MongoDB</AlertTitle>
+        <AlertDescription className="text-green-700">
+          Your data is being stored in MongoDB Atlas cloud database.
+        </AlertDescription>
+      </Alert>
+    );
+  }
   
   return (
     <Alert className="bg-amber-50 border-amber-200">
